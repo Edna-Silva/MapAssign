@@ -13,6 +13,9 @@
         android:theme="@style/Theme.HockeyNamibiaOrg"
         tools:targetApi="31">
         <activity
+            android:name=".uipages.player.PlayerActivity"
+            android:exported="false" />
+        <activity
             android:name=".uipages.common.testActivity"
             android:exported="false"
             android:theme="@style/Theme.HockeyNamibiaOrg" />
