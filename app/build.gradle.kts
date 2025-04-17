@@ -75,6 +75,12 @@ dependencies {
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")
 
+    // FCM
+    //implementation ("com.google.firebase:firebase-messaging:23.4.1")
+
+    // Optional: For displaying notifications
+    //implementation ("androidx.work:work-runtime:2.7.1")
+
     //Add dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
 
