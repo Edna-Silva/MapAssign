@@ -7,14 +7,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.hockeynamibiaorg.models.Event
-import com.example.hockeynamibiaorg.viewmodels.TeamViewModel
+import com.example.hockeynamibiaorg.data.models.Event
+import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 

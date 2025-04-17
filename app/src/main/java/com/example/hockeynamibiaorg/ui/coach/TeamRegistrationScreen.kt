@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.hockeynamibiaorg.viewmodels.TeamViewModel
+import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 
 @Composable
 fun TeamRegistrationScreen(navController: NavController) {
