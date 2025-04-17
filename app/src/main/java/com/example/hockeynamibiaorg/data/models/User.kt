@@ -10,7 +10,7 @@ data class User(
     val phone: String = "",
     val profileImageUrl: String = ""
 ) {
-    // Empty constructor for Firebase
+    // Empty constructor for Firebase or sqllite
     constructor() : this("", "", "", "", 0, "", "", "")
 }
 
