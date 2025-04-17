@@ -13,32 +13,35 @@
         android:theme="@style/Theme.HockeyNamibiaOrg"
         tools:targetApi="31">
         <activity
-            android:name=".uipages.player.PlayerActivity"
+            android:name=".uipages.coach.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.player.PlayerActivity"
             android:exported="false" />
         <activity
             android:name=".uipages.common.testActivity"
             android:exported="false"
             android:theme="@style/Theme.HockeyNamibiaOrg" />
         <activity
-            android:name=".uipages.common.NotificationActivity"
+            android:name=".ui.common.NotificationActivity"
             android:exported="false" />
         <activity
-            android:name=".uipages.common.SettingsActivity"
+            android:name=".ui.common.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".uipages.auth.RegisterActivity"
+            android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".uipages.auth.LoginActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".uipages.common.WelcomePageActivity"
+            android:name=".ui.common.WelcomePageActivity"
             android:exported="false" />
         <activity
-            android:name=".uipages.common.HomePageActivity"
+            android:name=".ui.common.HomePageActivity"
             android:exported="false" />
         <activity
-            android:name=".uipages.common.ListEventsActivity"
+            android:name=".ui.common.ListEventsActivity"
             android:exported="false" />
         <activity
             android:name=".uipages.coach.EventDetailsActivity"
