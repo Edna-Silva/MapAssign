@@ -17,9 +17,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Event
 import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
-import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventManagementScreen(navController: NavController, teamId: String) {
     val viewModel: TeamViewModel = viewModel()

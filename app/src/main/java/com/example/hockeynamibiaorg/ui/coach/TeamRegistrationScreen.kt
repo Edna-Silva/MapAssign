@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamRegistrationScreen(navController: NavController) {
     var teamName by remember { mutableStateOf("") }
