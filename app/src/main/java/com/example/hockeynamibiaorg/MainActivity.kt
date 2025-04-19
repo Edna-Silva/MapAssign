@@ -8,6 +8,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.ui.navigation.CoachNavigation
+import com.example.hockeynamibiaorg.ui.navigation.PlayerNavigation
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.example.hockeynamibiaorg.ui.theme.HockeyNamibiaOrgTheme
@@ -30,5 +31,5 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HockeyNamibiaApp() {
     val navController = rememberNavController()
-    CoachNavigation(navController)
+    PlayerNavigation(navController)
 }
