@@ -1,44 +1,57 @@
 package com.example.hockeynamibiaorg.ui.coach
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.hockeynamibiaorg.R
+import com.example.hockeynamibiaorg.ui.common.HockeyTopAppBar
+import com.example.hockeynamibiaorg.ui.common.HockeyBottomBar
+import com.example.hockeynamibiaorg.ui.common.Navigation
 
 @Composable
 fun CoachHomeScreen(navController: NavController) {
-    Scaffold { padding ->
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    Scaffold(
+        topBar = {
+            HockeyTopAppBar(
+                title = "Coach Dashboard",
+                onNotificationClick = { /* Handle notification */ },
+                onProfileClick = { /* Handle profile */ },
+                profileImage = painterResource(R.drawable.profileimage)
+            )
+        },
+        bottomBar = {
+            HockeyBottomBar(navController = navController, currentRoute = currentRoute)
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text("Welcome Coach!", style = MaterialTheme.typography.headlineLarge)
-
-            Button(
-                onClick = { navController.navigate("teamManagement") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Manage Teams")
-            }
-
-            Button(
-                onClick = { navController.navigate("teamRegistration") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Register New Team")
-            }
-        }
+        ) {}
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCoachHomeScreen() {
+    val navController = rememberNavController()
+    CoachHomeScreen(navController)
 }
