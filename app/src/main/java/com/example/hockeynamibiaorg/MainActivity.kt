@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+//import com.example.hockey.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.navigation.CoachNavigation
 import com.example.hockeynamibiaorg.ui.navigation.PlayerNavigation
 import com.google.firebase.Firebase
@@ -78,7 +79,7 @@ fun NamibiaHockeyApp() {
             TeamScreen(navController = navController)
         }
        composable("events") {
-            EventManagementScreen(navController = navController,"1")
+            EventManagementScreen(navController = navController)
         }
         composable("PlayerHomeScreen") {
             PlayerHomeScreen(navController = navController)
