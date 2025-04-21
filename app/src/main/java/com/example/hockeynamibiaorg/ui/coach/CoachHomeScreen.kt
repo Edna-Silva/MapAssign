@@ -15,15 +15,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.ui.common.HockeyTopAppBar
 import com.example.hockeynamibiaorg.ui.common.HockeyBottomBar
 import com.example.hockeynamibiaorg.ui.common.Navigation
+import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
+
+
 
 @Composable
-fun CoachHomeScreen(navController: NavController) {
+fun CoachHomeContent(navController: NavController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     Scaffold(
@@ -36,7 +42,10 @@ fun CoachHomeScreen(navController: NavController) {
             )
         },
         bottomBar = {
-            HockeyBottomBar(navController = navController, currentRoute = currentRoute)
+            HockeyBottomBar(
+                navController = navController,
+                currentRoute = currentRoute
+            )
         }
     ) { innerPadding ->
         Column(
@@ -45,13 +54,9 @@ fun CoachHomeScreen(navController: NavController) {
                 .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {}
-    }
-}
+        ) {
+            // home content here
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewCoachHomeScreen() {
-    val navController = rememberNavController()
-    CoachHomeScreen(navController)
+        }
+    }
 }

@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.hockeynamibiaorg.ui.coach.CoachHomeScreen
+import com.example.hockeynamibiaorg.ui.coach.CoachHomeContent
 import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.coach.PlayerDetailsScreen
 import com.example.hockeynamibiaorg.ui.coach.TeamManagementScreen
@@ -27,7 +27,7 @@ fun CoachNavigation(navController: NavHostController) {
         navController = navController,
         startDestination = "coachHome"
     ) {
-        composable("coachHome") { CoachHomeScreen(navController) }
+        composable("coachHome") { CoachHomeContent(navController) }
         composable("teamManagement") { TeamManagementScreen(navController) }
         composable("playerDetails/{playerId}") { backStackEntry ->
             PlayerDetailsScreen(
