@@ -1,5 +1,7 @@
 package com.example.hockeynamibiaorg.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHost
@@ -15,12 +17,14 @@ import com.example.hockeynamibiaorg.ui.coach.TeamManagementScreen
 
 import com.example.hockeynamibiaorg.ui.coach.TeamRegistrationScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun PreviewAll() {
     val navController = rememberNavController()
     CoachNavigation(navController)
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CoachNavigation(navController: NavHostController) {
     NavHost(
@@ -35,12 +39,12 @@ fun CoachNavigation(navController: NavHostController) {
                 playerId = backStackEntry.arguments?.getString("playerId") ?: ""
             )
         }
-        composable("teamRegistration") { TeamRegistrationScreen(navController) }
-        composable("eventManagement/{teamId}") { backStackEntry ->
+        composable("events") { EventManagementScreen(navController,"1") }
+        /*composable("eventManagement/{teamId}") { backStackEntry ->
             EventManagementScreen(
                 navController = navController,
                 teamId = backStackEntry.arguments?.getString("teamId") ?: ""
             )
-        }
+        }*/
     }
 }
