@@ -48,7 +48,6 @@ fun RemovePlayerScreen(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
         )
 
-        Text("Age Group", style = TextStyle(fontWeight = FontWeight.Bold))
         Column {
             OutlinedTextField(
                 value = ageGroupToRemove,

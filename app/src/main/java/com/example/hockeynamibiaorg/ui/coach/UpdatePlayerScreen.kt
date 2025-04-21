@@ -49,7 +49,6 @@ fun UpdatePlayerScreen(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
         )
 
-        Text("Age Group", style = TextStyle(fontWeight = FontWeight.Bold))
         Column {
             OutlinedTextField(
                 value = ageGroupToUpdate,
@@ -80,7 +79,6 @@ fun UpdatePlayerScreen(
             }
         }
 
-        Text("New Team Name", style = TextStyle(fontWeight = FontWeight.Bold))
         Column {
             OutlinedTextField(
                 value = newTeamName,

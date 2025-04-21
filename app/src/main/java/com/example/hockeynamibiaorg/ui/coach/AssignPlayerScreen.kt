@@ -60,7 +60,6 @@ fun AssignPlayerScreen(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
         )
 
-        Text("Age Group", style = TextStyle(fontWeight = FontWeight.Bold))
         Column {
             OutlinedTextField(
                 value = selectedAgeGroup,
@@ -92,7 +91,6 @@ fun AssignPlayerScreen(
 
         }
 
-        Text("Team Name", style = TextStyle(fontWeight = FontWeight.Bold))
         Column {
             OutlinedTextField(
                 value = selectedTeam,
