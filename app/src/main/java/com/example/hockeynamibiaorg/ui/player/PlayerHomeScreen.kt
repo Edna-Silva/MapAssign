@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
@@ -53,7 +54,7 @@ fun HeaderSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF6CF48))
+            .background(Color(0xFF033580))
     ) {
         Row(
             modifier = Modifier
@@ -62,12 +63,6 @@ fun HeaderSection() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Planning",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
 
             Surface(
                 modifier = Modifier.size(48.dp),
@@ -225,7 +220,7 @@ fun MatchCard(teams: String, dateTime: String, venue: String) {
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     BottomAppBar(
-        containerColor = Color(0xFFF6CF48),
+        containerColor = Color(0xFF033580),
         contentColor = Color.Black
     ) {
         Row(
