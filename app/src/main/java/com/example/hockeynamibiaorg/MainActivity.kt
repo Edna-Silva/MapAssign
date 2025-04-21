@@ -67,7 +67,8 @@ fun NamibiaHockeyApp() {
             RegisterScreen(navController = navController)
         }
         composable("home") {
-            CoachHomeContent(navController = navController)
+            //CoachHomeContent(navController = navController)
+            PlayerHomeScreen(navController = navController)
         }
         composable("teams") {
             TeamScreen(navController = navController)
