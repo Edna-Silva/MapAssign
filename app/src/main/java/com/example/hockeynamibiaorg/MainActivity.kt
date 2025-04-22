@@ -11,9 +11,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+//import com.example.hockey.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.navigation.CoachNavigation
 import com.example.hockeynamibiaorg.ui.navigation.PlayerNavigation
 import com.google.firebase.Firebase
@@ -29,7 +32,12 @@ import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.coach.PlayerDetailsScreen
 import com.example.hockeynamibiaorg.ui.coach.TeamScreen
 import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
+import com.example.hockeynamibiaorg.ui.player.EventEntriesScreen
+import com.example.hockeynamibiaorg.ui.player.HockeyPlayer
 import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
+import com.example.hockeynamibiaorg.ui.player.PlayerProfile
+import com.example.hockeynamibiaorg.ui.player.PlayerStats
+import com.example.hockeynamibiaorg.ui.player.Screen
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -41,15 +49,51 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NamibiaHockeyApp()
+                   // NamibiaHockeyApp()
                     //MainScreen()
+                    val navController: NavHostController = rememberNavController()
+                    PlayerAppNavHost(navController)
                 }
             }
         }
     }
 }
+@Composable
+fun PlayerAppNavHost(navController: NavHostController) {
+    NavHost(navController, startDestination = Screen.PlayerHome.route) {
+        composable(Screen.PlayerHome.route) {
+            PlayerHomeScreen(navController)
+        }
+        composable(Screen.PlayerEvents.route) {
+            EventEntriesScreen(navController) // Your Profile Composable
+        }
+        composable(Screen.Profile.route) {
+            PlayerProfile(samplePlayer) // Your Profile Composable
+        }
+    }
+}
 
-@RequiresApi(Build.VERSION_CODES.O)
+
+    val samplePlayer = HockeyPlayer(
+        name = "Connor McDavid",
+        number = 97,
+        position = "Center",
+        team = "Edmonton Oilers",
+        age = 26,
+        height = "6'1\"",
+        weight = "193 lbs",
+        stats = PlayerStats(
+            goals = 44,
+            assists = 79,
+            points = 123,
+            plusMinus = 28,
+            penaltyMinutes = 36
+        ),
+        imageRes = R.drawable.profileimage // Replace with actual image resource
+    )
+
+
+/*@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun PreviewAll() {
@@ -79,7 +123,7 @@ fun NamibiaHockeyApp() {
             TeamScreen(navController = navController)
         }
        composable("events") {
-            EventManagementScreen(navController = navController,"1")
+            EventManagementScreen(navController = navController)
         }
         composable("PlayerHomeScreen") {
             PlayerHomeScreen(navController = navController)
@@ -87,7 +131,10 @@ fun NamibiaHockeyApp() {
         composable("players") {
             PlayerDetailsScreen(navController = navController,"78")
         }
+        composable("PlayersEvents") {
+            EventEntriesScreen(navController = navController)
+        }
 
 
     }
-}
+}*/

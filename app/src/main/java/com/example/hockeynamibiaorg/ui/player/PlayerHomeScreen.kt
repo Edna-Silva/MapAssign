@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 
@@ -32,8 +33,9 @@ import com.example.hockeynamibiaorg.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerHomeScreen(navController: NavHostController) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = { BottomNavigationBar(navController, currentRoute = currentRoute) }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -218,7 +220,7 @@ fun MatchCard(teams: String, dateTime: String, venue: String) {
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavHostController, currentRoute: String?) {
     BottomAppBar(
         containerColor = Color(0xFF033580),
         contentColor = Color.Black
@@ -230,22 +232,26 @@ fun BottomNavigationBar(navController: NavHostController) {
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Home",
-                modifier = Modifier.clickable { navController.navigate("home") }
+                modifier = Modifier.clickable { navController.navigate("home")},
+                tint = Color.White
             )
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Matches",
-                modifier = Modifier.clickable { navController.navigate("matches") }
+                modifier = Modifier.clickable { navController.navigate("PlayerEvents") },
+                tint = Color.White
             )
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = "Notifications",
-                modifier = Modifier.clickable { navController.navigate("notifications") }
+                modifier = Modifier.clickable { navController.navigate("notifications") },
+                tint = Color.White
             )
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile",
-                modifier = Modifier.clickable { navController.navigate("profile") }
+                modifier = Modifier.clickable { navController.navigate("profile") },
+                tint = Color.White
             )
         }
     }
