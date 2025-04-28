@@ -11,37 +11,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-//import com.example.hockey.ui.coach.EventManagementScreen
-import com.example.hockeynamibiaorg.ui.navigation.CoachNavigation
-import com.example.hockeynamibiaorg.ui.navigation.PlayerNavigation
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import com.example.hockeynamibiaorg.ui.theme.HockeyNamibiaOrgTheme
 
 import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
 
 import com.example.hockeynamibiaorg.ui.auth.LoginScreen
 import com.example.hockeynamibiaorg.ui.auth.RegisterScreen
+import com.example.hockeynamibiaorg.ui.auth.samplePlayer
 import com.example.hockeynamibiaorg.ui.coach.CoachHomeContent
 import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
-import com.example.hockeynamibiaorg.ui.coach.PlayerDetailsScreen
 import com.example.hockeynamibiaorg.ui.coach.PlayerManagementScreen
 import com.example.hockeynamibiaorg.ui.coach.TeamScreen
-import com.example.hockeynamibiaorg.ui.common.ASSIGN_PLAYER
-import com.example.hockeynamibiaorg.ui.common.PLAYER_MANAGEMENT
-import com.example.hockeynamibiaorg.ui.common.REMOVE_PLAYER
-import com.example.hockeynamibiaorg.ui.common.UPDATE_PLAYER
-import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
+import com.example.hockeynamibiaorg.ui.common.Navigation
+import com.example.hockeynamibiaorg.ui.player.EventEntriesScreen
 import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
-import com.example.myapplication.AssignPlayerScreen
+import com.example.hockeynamibiaorg.ui.player.PlayerProfile
 import com.example.myapplication.RemovePlayer
-import com.example.myapplication.RemovePlayerScreen
-import com.example.myapplication.UpdatePlayerScreen
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -53,8 +41,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NamibiaHockeyApp()
-                    //MainScreen()
+                   HockeyApp()
                 }
             }
         }
@@ -62,60 +49,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
 @Composable
-fun PreviewAll() {
-
-    NamibiaHockeyApp()
-}
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-/*fun NamibiaHockeyApp() {
+fun HockeyApp() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "welcome") {
-        composable("welcome") {
-            WelcomeScreen(navController = navController)
-        }
-        composable("login") {
-            LoginScreen(navController = navController)
-        }
-        composable("register") {
-            RegisterScreen(navController = navController)
-        }
-        composable("home") {
-            CoachHomeContent(navController = navController)
-        }
-        composable("teams") {
-            TeamScreen(navController = navController)
-        }
-       composable("events") {
-            EventManagementScreen(navController = navController)
-        }
-        composable("players") {
-            PlayerManagementScreen(navController = navController)
-        }
-        composable(PLAYER_MANAGEMENT) {
-            PlayerManagementScreen(navController)
-        }
-       // composable(ASSIGN_PLAYER) {
-         //   AssignPlayerScreen(navController)
-        //}
-        composable( REMOVE_PLAYER){
+    NavHost(
+        navController = navController,
+        startDestination = Navigation.Welcome.route
+    ) {
+        // Auth screens
 
-            RemovePlayer(navController)
-        }
-        /*composable(
-            route = UPDATE_PLAYER,
-            arguments = listOf(navArgument("playerId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val playerId = backStackEntry.arguments?.getInt("playerId") ?: 0
-            UpdatePlayerScreen(navController, playerId)
-        }*/
+        composable(Navigation.Welcome.route) { WelcomeScreen(navController) }
+        composable(Navigation.Login.route) { LoginScreen(navController) }
+        composable(Navigation.Register.route) { RegisterScreen(navController) }
+
+        // Player screens
+        composable(Navigation.PlayerHome.route) { PlayerHomeScreen(navController) }
+        composable(Navigation.PlayerEvents.route) { EventEntriesScreen(navController) }
+        composable(Navigation.PlayerProfile.route) { PlayerProfile(samplePlayer) }
+
+        // Coach screens
+        composable(Navigation.CoachHome.route) { CoachHomeContent(navController) }
+        composable(Navigation.Teams.route) { TeamScreen(navController) }
+        composable(Navigation.Events.route) { EventManagementScreen(navController) }
+        composable(Navigation.PlayerManagement.route) { PlayerManagementScreen(navController) }
+        composable(Navigation.RemovePlayer.route) { RemovePlayer(navController) }
     }
-
-
-
-
-}*/
-
+}

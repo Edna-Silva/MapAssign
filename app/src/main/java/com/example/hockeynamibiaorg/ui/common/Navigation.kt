@@ -1,17 +1,19 @@
 
 package com.example.hockeynamibiaorg.ui.common
-
-// Define your coach navigation routes
 sealed class Navigation(val route: String) {
-    object Home : Navigation("home")
+    object Welcome : Navigation("welcome")
+    object Login : Navigation("login")
+    object Register : Navigation("register")
+
+    // Player routes
+    object PlayerHome : Navigation("player_home")
+    object PlayerEvents : Navigation("player_events")
+    object PlayerProfile : Navigation("player_profile")
+
+    // Coach routes
+    object CoachHome : Navigation("coach_home")
     object Teams : Navigation("teams")
-    object Players : Navigation("players")
-    object Events : Navigation("events")
+    object Events : Navigation("coach_events")
+    object PlayerManagement : Navigation("player_management")
+    object RemovePlayer : Navigation("remove_player")
 }
-
-// Similarly for PlayerNavigation.kt
-const val PLAYER_MANAGEMENT = "playerManagement"
-const val ASSIGN_PLAYER = "assignPlayer"
-const val REMOVE_PLAYER = "removePlayer"
-
-const val UPDATE_PLAYER = "updatePlayer/{playerId}"

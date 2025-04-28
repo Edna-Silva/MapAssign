@@ -27,8 +27,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.ui.theme.Purple80
 import com.example.hockeynamibiaorg.ui.theme.Purple80
 
@@ -39,7 +41,7 @@ fun EventEntriesScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Event Entries") },
+                title = { Text("Events") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
@@ -85,15 +87,16 @@ data class Event(
     val name: String,
     val date: String,
     val location: String,
-    val registrationOpen: Boolean
+
 )
 
 fun getSampleEvents(): List<Event> {
     return listOf(
-        Event("National Tournament", "May 15, 2025", "Windhoek National Stadium", true),
-        Event("Regional Championship", "June 23, 2025", "Swakopmund Sports Center", true),
-        Event("Youth Hockey Camp", "July 10, 2025", "Windhoek Hockey Club", false),
-        Event("League Season Opening", "August 5, 2025", "Various Locations", true)
+        Event("National Tournament", "May 15, 2025", "Windhoek National Stadium"),
+        Event("Regional Championship", "June 23, 2025", "Swakopmund Sports Center"),
+        Event("Youth Hockey Camp", "July 10, 2025", "Windhoek Hockey Club"),
+        Event("League Season Opening", "August 5, 2025", "Various Locations"),
+        Event("League Season Opening", "August 5, 2025", "Various Locations")
     )
 }
 
@@ -124,27 +127,17 @@ fun EventCard(event: Event) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = if (event.registrationOpen) "Registration: Open" else "Registration: Closed",
-                color = if (event.registrationOpen) Color.Green else Color.Red
-            )
-
-            if (event.registrationOpen) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                IconButton(
-                    onClick = { /* Registration logic */ },
-                    modifier = Modifier.align(androidx.compose.ui.Alignment.End)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Register",
-                        tint = Purple80
-                    )
-                }
             }
         }
     }
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun PlayerEvents() {
+    val navController: NavController = rememberNavController()
+    MaterialTheme {
+        EventEntriesScreen(navController)
+    }
 }
-
-

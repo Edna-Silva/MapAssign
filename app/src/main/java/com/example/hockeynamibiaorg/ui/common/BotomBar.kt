@@ -25,9 +25,9 @@ fun HockeyBottomBar(
 ) {
     NavigationBar(modifier = Modifier.height(64.dp)) {
         val navItems = listOf(
-            Navigation.Home,
+            Navigation.CoachHome,
             Navigation.Teams,
-            Navigation.Players,
+            Navigation.PlayerManagement,
             Navigation.Events
         )
 
@@ -35,10 +35,17 @@ fun HockeyBottomBar(
             NavigationBarItem(
                 icon = {
                     when (screen) {
-                        Navigation.Home -> Icon(Icons.Default.Home, contentDescription = "Home")
+                        Navigation.CoachHome -> Icon(Icons.Default.Home, contentDescription = "Home")
                         Navigation.Teams -> Icon(Icons.Default.Notifications, contentDescription = "Teams")
-                        Navigation.Players -> Icon(Icons.Default.Person, contentDescription = "Players")
+                        Navigation.PlayerManagement -> Icon(Icons.Default.Person, contentDescription = "Players")
                         Navigation.Events -> Icon(Icons.Default.Search, contentDescription = "Events")
+                        Navigation.Login -> TODO()
+                        Navigation.PlayerEvents -> TODO()
+                        Navigation.PlayerHome -> TODO()
+                        Navigation.PlayerProfile -> TODO()
+                        Navigation.Register -> TODO()
+                        Navigation.RemovePlayer -> TODO()
+                        Navigation.Welcome -> TODO()
                     }
                 },
                 label = { Text(screen.route.substringAfter("_").replaceFirstChar { it.uppercase() }) },

@@ -24,7 +24,7 @@ import com.example.hockeynamibiaorg.ui.theme.Pink80
 import com.example.hockeynamibiaorg.ui.theme.Purple80
 
 @Composable
-fun PrimaryButton(text: String,     modifier: Modifier = Modifier  ,onClick: @Composable () -> Unit) {
+fun PrimaryButton(text: String,modifier: Modifier = Modifier  ,onClick: ()-> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Purple80),

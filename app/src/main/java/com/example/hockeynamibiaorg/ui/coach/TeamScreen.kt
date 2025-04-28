@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
@@ -29,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.ui.common.HockeyBottomBar
 import com.example.hockeynamibiaorg.ui.common.HockeyTopAppBar
+import com.example.hockeynamibiaorg.ui.theme.Purple80
 
 @Preview(showBackground = true)
 @Composable
@@ -64,17 +66,21 @@ fun TeamScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            HockeyTopAppBar(
-                title = "Team Management",
-                onNotificationClick = { /* Handle notification */ },
-                onProfileClick = { /* Handle profile */ },
-                profileImage = painterResource(R.drawable.profileimage)
-            )
-        },
-        bottomBar = {
-            HockeyBottomBar(
-                navController = navController,
-                currentRoute = "teamScreen"
+            TopAppBar(
+                title = { Text("Player Management") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Purple80,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
         }
     ) { paddingValues ->

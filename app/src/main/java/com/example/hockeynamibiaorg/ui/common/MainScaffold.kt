@@ -35,9 +35,9 @@ fun HockeyScaffold(
         },
         bottomBar = {
             if (currentRoute in listOf(
-                    Navigation.Home.route,
+                    Navigation.CoachHome.route,
                     Navigation.Teams.route,
-                    Navigation.Players.route,
+                    Navigation.PlayerManagement.route,
                     Navigation.Events.route
                 )) {
                 HockeyBottomBar(navController, currentRoute)
@@ -55,7 +55,7 @@ fun PreviewBottomBar() {
     val fakeNavController = rememberNavController()
     HockeyBottomBar(
         navController = fakeNavController,
-        currentRoute = Navigation.Home.route // Force a route to show the bar
+        currentRoute = Navigation.CoachHome.route // Force a route to show the bar
     )
 }
 

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,38 +27,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.hockeynamibiaorg.ui.coach.CoachHomeContent
-import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
-import com.example.hockeynamibiaorg.ui.coach.PlayerManagementScreen
-import com.example.hockeynamibiaorg.ui.coach.TeamScreen
+
+import com.example.hockeynamibiaorg.R
+
 import com.example.hockeynamibiaorg.ui.common.AppTextField
-import com.example.hockeynamibiaorg.ui.common.PLAYER_MANAGEMENT
+import com.example.hockeynamibiaorg.ui.common.Navigation
+//import com.example.hockeynamibiaorg.ui.common.PLAYER_MANAGEMENT
 import com.example.hockeynamibiaorg.ui.common.PrimaryButton
-import com.example.hockeynamibiaorg.ui.common.REMOVE_PLAYER
+//import com.example.hockeynamibiaorg.ui.common.REMOVE_PLAYER
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
 import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
+import com.example.hockeynamibiaorg.ui.player.EventEntriesScreen
+import com.example.hockeynamibiaorg.ui.player.HockeyPlayer
+import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
+import com.example.hockeynamibiaorg.ui.player.PlayerProfile
+import com.example.hockeynamibiaorg.ui.player.PlayerStats
 import com.example.myapplication.RemovePlayer
+import com.example.hockeynamibiaorg.ui.theme.Purple80
+// 1. First
 
+// 2. Main NavHost that handles all navigation
+
+// 3. Login Screen with proper navigation
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
-    // Role selection state
     var expanded by remember { mutableStateOf(false) }
     var selectedRole by remember { mutableStateOf("Player") }
     val roles = listOf("Player", "Coach")
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,14 +79,11 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            //Spacer(modifier = Modifier.height(16.dp))
-
             AppTextField(label = "Your Email")
-
             Spacer(modifier = Modifier.height(16.dp))
-
             AppTextField(label = "Password", isPassword = true)
             Spacer(modifier = Modifier.height(16.dp))
+
             // Role Selection Dropdown
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -104,10 +107,8 @@ fun LoginScreen(navController: NavController) {
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier.fillMaxWidth(),
-
-
-                    ) {
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     roles.forEach { role ->
                         DropdownMenuItem(
                             text = { Text(text = role) },
@@ -120,68 +121,68 @@ fun LoginScreen(navController: NavController) {
                 }
             }
 
-
             Spacer(modifier = Modifier.height(32.dp))
 
             PrimaryButton(
                 text = "Login as $selectedRole",
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if(selectedRole=="Player"){
-                // You can use selectedRole here for different navigation logic if needed
-                    CoachNav()
-
-            //    navController.navigate("home") {
-              //      popUpTo("welcome") { inclusive = true }
-                //}
-                }
-                    else{
-                        navController.navigate("home") {
-                            popUpTo("welcome") { inclusive = true }
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    when (selectedRole) {
+                        "Player" -> navController.navigate(Navigation.PlayerHome.route) {
+                            popUpTo(Navigation.Login.route) { inclusive = true }
+                        }
+                        "Coach" -> navController.navigate(Navigation.CoachHome.route) {
+                            popUpTo(Navigation.Login.route) { inclusive = true }
+                        }
                     }
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             SecondaryButton(
                 text = "Register",
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                navController.navigate("register")
-            }
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { navController.navigate(Navigation.Register.route) }
+            )
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+// 4. PrimaryButton implementation
 @Composable
-fun CoachNav(){
-
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            CoachHomeContent(navController = navController)
-        }
-        composable("teams") {
-            TeamScreen(navController = navController)
-        }
-        composable("events") {
-            EventManagementScreen(navController = navController)
-        }
-        composable("players") {
-            PlayerManagementScreen(navController = navController)
-        }
-        composable(PLAYER_MANAGEMENT) {
-            PlayerManagementScreen(navController)
-        }
-        // composable(ASSIGN_PLAYER) {
-        //   AssignPlayerScreen(navController)
-        //}
-        composable(REMOVE_PLAYER) {
-
-            RemovePlayer(navController)
-        }
+fun PrimaryButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = Purple80),
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    ) {
+        Text(text = text, color = Color.White)
     }
 }
+
+// 5. Sample data (keep your existing implementation)
+val samplePlayer = HockeyPlayer(
+    name = "Connor McDavid",
+    number = 97,
+    position = "Center",
+    team = "Edmonton Oilers",
+    age = 26,
+    height = "6'1\"",
+    weight = "193 lbs",
+    stats = PlayerStats(
+        goals = 44,
+        assists = 79,
+        points = 123,
+        plusMinus = 28,
+        penaltyMinutes = 36
+    ),
+    imageRes = R.drawable.profileimage
+)
