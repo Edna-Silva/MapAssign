@@ -1,5 +1,7 @@
 package com.example.hockeynamibiaorg.ui.auth
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,10 +29,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.hockeynamibiaorg.ui.coach.CoachHomeContent
+import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
+import com.example.hockeynamibiaorg.ui.coach.PlayerManagementScreen
+import com.example.hockeynamibiaorg.ui.coach.TeamScreen
 import com.example.hockeynamibiaorg.ui.common.AppTextField
+import com.example.hockeynamibiaorg.ui.common.PLAYER_MANAGEMENT
 import com.example.hockeynamibiaorg.ui.common.PrimaryButton
+import com.example.hockeynamibiaorg.ui.common.REMOVE_PLAYER
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
+import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
+import com.example.myapplication.RemovePlayer
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -113,9 +127,18 @@ fun LoginScreen(navController: NavController) {
                 text = "Login as $selectedRole",
                 modifier = Modifier.fillMaxWidth()
             ) {
+                if(selectedRole=="Player"){
                 // You can use selectedRole here for different navigation logic if needed
-                navController.navigate("home") {
-                    popUpTo("welcome") { inclusive = true }
+                    CoachNav()
+
+            //    navController.navigate("home") {
+              //      popUpTo("welcome") { inclusive = true }
+                //}
+                }
+                    else{
+                        navController.navigate("home") {
+                            popUpTo("welcome") { inclusive = true }
+                    }
                 }
             }
 
@@ -127,6 +150,38 @@ fun LoginScreen(navController: NavController) {
             ) {
                 navController.navigate("register")
             }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun CoachNav(){
+
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            CoachHomeContent(navController = navController)
+        }
+        composable("teams") {
+            TeamScreen(navController = navController)
+        }
+        composable("events") {
+            EventManagementScreen(navController = navController)
+        }
+        composable("players") {
+            PlayerManagementScreen(navController = navController)
+        }
+        composable(PLAYER_MANAGEMENT) {
+            PlayerManagementScreen(navController)
+        }
+        // composable(ASSIGN_PLAYER) {
+        //   AssignPlayerScreen(navController)
+        //}
+        composable(REMOVE_PLAYER) {
+
+            RemovePlayer(navController)
         }
     }
 }

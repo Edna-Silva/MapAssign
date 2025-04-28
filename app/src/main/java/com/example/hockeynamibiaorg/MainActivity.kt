@@ -11,9 +11,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 //import com.example.hockey.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.navigation.CoachNavigation
 import com.example.hockeynamibiaorg.ui.navigation.PlayerNavigation
@@ -28,9 +30,18 @@ import com.example.hockeynamibiaorg.ui.auth.RegisterScreen
 import com.example.hockeynamibiaorg.ui.coach.CoachHomeContent
 import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.coach.PlayerDetailsScreen
+import com.example.hockeynamibiaorg.ui.coach.PlayerManagementScreen
 import com.example.hockeynamibiaorg.ui.coach.TeamScreen
+import com.example.hockeynamibiaorg.ui.common.ASSIGN_PLAYER
+import com.example.hockeynamibiaorg.ui.common.PLAYER_MANAGEMENT
+import com.example.hockeynamibiaorg.ui.common.REMOVE_PLAYER
+import com.example.hockeynamibiaorg.ui.common.UPDATE_PLAYER
 import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
 import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
+import com.example.myapplication.AssignPlayerScreen
+import com.example.myapplication.RemovePlayer
+import com.example.myapplication.RemovePlayerScreen
+import com.example.myapplication.UpdatePlayerScreen
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -59,7 +70,7 @@ fun PreviewAll() {
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NamibiaHockeyApp() {
+/*fun NamibiaHockeyApp() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "welcome") {
@@ -81,13 +92,30 @@ fun NamibiaHockeyApp() {
        composable("events") {
             EventManagementScreen(navController = navController)
         }
-        composable("PlayerHomeScreen") {
-            PlayerHomeScreen(navController = navController)
-        }
         composable("players") {
-            PlayerDetailsScreen(navController = navController,"78")
+            PlayerManagementScreen(navController = navController)
         }
+        composable(PLAYER_MANAGEMENT) {
+            PlayerManagementScreen(navController)
+        }
+       // composable(ASSIGN_PLAYER) {
+         //   AssignPlayerScreen(navController)
+        //}
+        composable( REMOVE_PLAYER){
 
-
+            RemovePlayer(navController)
+        }
+        /*composable(
+            route = UPDATE_PLAYER,
+            arguments = listOf(navArgument("playerId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val playerId = backStackEntry.arguments?.getInt("playerId") ?: 0
+            UpdatePlayerScreen(navController, playerId)
+        }*/
     }
-}
+
+
+
+
+}*/
+

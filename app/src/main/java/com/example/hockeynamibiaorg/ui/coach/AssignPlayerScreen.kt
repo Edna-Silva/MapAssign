@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 fun AssignPlayerScreen(
     navController: NavHostController,
     playerViewModel: PlayerViewModel,
-    coachName: String,
     ageGroup: String
 ) {
     var username by remember { mutableStateOf("") }
