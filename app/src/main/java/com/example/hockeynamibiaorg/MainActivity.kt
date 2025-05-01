@@ -1,7 +1,10 @@
 package com.example.hockeynamibiaorg
 
+import android.content.ContentValues.TAG
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -10,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,8 +34,13 @@ import com.example.hockeynamibiaorg.ui.player.EventEntriesScreen
 import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
 import com.example.hockeynamibiaorg.ui.player.PlayerProfile
 import com.example.myapplication.RemovePlayer
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+
 
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +50,25 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                   HockeyApp()
+                    val context = LocalContext.current  // Get the correct context
+                    val db = Firebase.firestore
+                    // Create a new user with a first and last name
+                    val user = hashMapOf(
+                        "first" to "Ada",
+                        "last" to "Lovelace",
+                        "born" to 1815
+                    )
+
+// Add a new document with a generated ID
+                    db.collection("users")
+                        .add(user)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error adding document", e)
+                        }
+                    HockeyApp()
                 }
             }
         }
