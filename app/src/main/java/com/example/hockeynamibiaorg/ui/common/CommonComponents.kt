@@ -24,9 +24,14 @@ import com.example.hockeynamibiaorg.ui.theme.Pink80
 import com.example.hockeynamibiaorg.ui.theme.Purple80
 
 @Composable
-fun PrimaryButton(text: String,modifier: Modifier = Modifier  ,onClick: ()-> Unit) {
+fun PrimaryButton(
+    text: String,modifier: Modifier = Modifier  ,
+    enabled: Boolean = true,
+    onClick: ()-> Unit)
+{
     Button(
         onClick = onClick,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(containerColor = Purple80),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
@@ -39,9 +44,14 @@ fun PrimaryButton(text: String,modifier: Modifier = Modifier  ,onClick: ()-> Uni
 }
 
 @Composable
-fun SecondaryButton(text: String,    modifier: Modifier = Modifier  , onClick: () -> Unit) {
+fun SecondaryButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = Pink80,
             //contentColor = PrimaryTeal
@@ -61,13 +71,16 @@ fun SecondaryButton(text: String,    modifier: Modifier = Modifier  , onClick: (
 fun AppTextField(
     label: String,
     isPassword: Boolean = false,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val text = remember { mutableStateOf("") }
 
     OutlinedTextField(
-        value = text.value,
-        onValueChange = { text.value = it },
+
+        value =value,
+        onValueChange =onValueChange,
         label = { Text(label) },
         modifier = Modifier
             .fillMaxWidth()

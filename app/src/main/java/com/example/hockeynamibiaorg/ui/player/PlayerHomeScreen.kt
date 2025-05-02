@@ -30,7 +30,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerHomeScreen(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route

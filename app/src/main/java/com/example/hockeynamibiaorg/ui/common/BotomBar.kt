@@ -46,6 +46,7 @@ fun HockeyBottomBar(
                         Navigation.Register -> TODO()
                         Navigation.RemovePlayer -> TODO()
                         Navigation.Welcome -> TODO()
+                        Navigation.ForgotPassword -> TODO()
                     }
                 },
                 label = { Text(screen.route.substringAfter("_").replaceFirstChar { it.uppercase() }) },

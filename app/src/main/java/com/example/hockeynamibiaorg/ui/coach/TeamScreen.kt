@@ -8,66 +8,53 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.hockeynamibiaorg.R
-import com.example.hockeynamibiaorg.ui.common.HockeyBottomBar
-import com.example.hockeynamibiaorg.ui.common.HockeyTopAppBar
+import com.example.hockeynamibiaorg.data.models.Team
 import com.example.hockeynamibiaorg.ui.theme.Purple80
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewScreen() {
-    val navController = rememberNavController()
-    TeamScreen(navController)
-}
-// Data class to represent a team
-data class Team(
-    val id: Int,
-    val name: String,
-    val memberCount: Int,
-    val projectCount: Int
-)
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamScreen(navController: NavController) {
-    // Sample team data
-    val teamsList = remember {
-        mutableStateListOf(
-            Team(1, "Marketing Team", 5, 3),
-            Team(2, "Development Team", 8, 4),
-            Team(3, "Design Team", 4, 2),
-            Team(4, "Sales Team", 6, 1)
-        )
-    }
+    val db = FirebaseFirestore.getInstance()
+    val auth = FirebaseAuth.getInstance()
+    val currentUserId = auth.currentUser?.uid ?: ""
 
-    // State for the selected team and dialog visibility
+    var teams by remember { mutableStateOf<List<Team>>(emptyList()) }
+    var showAddTeamDialog by remember { mutableStateOf(false) }
     var selectedTeam by remember { mutableStateOf<Team?>(null) }
     var showTeamDialog by remember { mutableStateOf(false) }
+
+    // Fetch teams for the current coach
+    LaunchedEffect(currentUserId) {
+        if (currentUserId.isNotEmpty()) {
+            db.collection("teams")
+                .whereEqualTo("coachId", currentUserId)
+                .get()
+                .addOnSuccessListener { result ->
+                    teams = result.toObjects(Team::class.java)
+                }
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Player Management") },
+                title = { Text("Team Management") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
@@ -82,58 +69,95 @@ fun TeamScreen(navController: NavController) {
                     navigationIconContentColor = Color.White
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddTeamDialog = true },
+                containerColor = Purple80
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Team")
+            }
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Your Teams",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(teamsList) { team ->
-                    TeamCard(
-                        team = team,
-                        onClick = {
-                            selectedTeam = team
-                            showTeamDialog = true
-                        }
+                .padding(16.dp))
+                {
+                    Text(
+                        text = "Your Hockey Teams",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-                }
-            }
-        }
 
-        // Dialog to show when a team is selected
-        if (showTeamDialog && selectedTeam != null) {
-            TeamActionsDialog(
-                team = selectedTeam!!,
-                onDismiss = {
-                    showTeamDialog = false
-                    selectedTeam = null
-                },
-                onDelete = {
-                    // Remove the team from the list
-                    teamsList.remove(selectedTeam)
-                    showTeamDialog = false
-                    selectedTeam = null
-                },
-                onUpdate = {
-                    // Update functionality would go here
-                    showTeamDialog = false
-                    selectedTeam = null
+                    if (teams.isEmpty()) {
+                        Text(
+                            text = "No teams yet. Click the + button to add a team.",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(teams) { team ->
+                                TeamCard(
+                                    team = team,
+                                    onClick = {
+                                        selectedTeam = team
+                                        showTeamDialog = true
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
-            )
-        }
+
+            // Add Team Dialog
+            if (showAddTeamDialog) {
+                AddTeamDialog(
+                    onDismiss = { showAddTeamDialog = false },
+                    onSave = { teamName, ageGroup, category ->
+                        val newTeam = Team(
+                            id = db.collection("teams").document().id,
+                            name = teamName,
+                            ageGroup = ageGroup,
+                            category = category,
+                            coachId = currentUserId
+                        )
+                        db.collection("teams").document(newTeam.id).set(newTeam)
+                        showAddTeamDialog = false
+                    }
+                )
+            }
+
+            // Team Actions Dialog
+            if (showTeamDialog && selectedTeam != null) {
+                TeamActionsDialog(
+                    team = selectedTeam!!,
+                    onDismiss = {
+                        showTeamDialog = false
+                        selectedTeam = null
+                    },
+                    onDelete = {
+                        db.collection("teams").document(selectedTeam!!.id).delete()
+                        showTeamDialog = false
+                        selectedTeam = null
+                    },
+                    onEdit = {
+                        // This would navigate to an edit screen
+                        navController.navigate("editTeam/${selectedTeam?.id}")
+                        showTeamDialog = false
+                    },
+                    onViewPlayers = {
+                        navController.navigate("teamPlayers/${selectedTeam?.id}")
+                        showTeamDialog = false
+                    }
+                )
+            }
     }
 }
 
@@ -144,9 +168,7 @@ fun TeamCard(team: Team, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier
@@ -154,16 +176,16 @@ fun TeamCard(team: Team, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Team Icon
+            // Team Icon with hockey theme
             Box(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF3498DB)),
+                    .background(Color(0xFF1E88E5)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    imageVector = Icons.Default.Home,
                     contentDescription = null,
                     tint = Color.White
                 )
@@ -182,7 +204,12 @@ fun TeamCard(team: Team, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${team.memberCount} members · ${team.projectCount} projects",
+                    text = "${team.ageGroup} • ${team.category}",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "${team.players.size} players",
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
@@ -192,67 +219,245 @@ fun TeamCard(team: Team, onClick: () -> Unit) {
 }
 
 @Composable
+fun AddTeamDialog(
+    onDismiss: () -> Unit,
+    onSave: (String, String, String) -> Unit
+) {
+    var teamName by remember { mutableStateOf("") }
+    var ageGroup by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add New Team") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = teamName,
+                    onValueChange = { teamName = it },
+                    label = { Text("Team Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = ageGroup,
+                    onValueChange = { ageGroup = it },
+                    label = { Text("Age Group (e.g., U12, U14, U16)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Category (Indoor/Outdoor/Mixed)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (teamName.isNotBlank() && ageGroup.isNotBlank() && category.isNotBlank()) {
+                        onSave(teamName, ageGroup, category)
+                    }
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun TeamActionsDialog(
     team: Team,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
-    onUpdate: () -> Unit
+    onEdit: () -> Unit,
+    onViewPlayers: () -> Unit
 ) {
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(team.name) },
+        text = {
+            Column {
+                Text("Age Group: ${team.ageGroup}")
+                Text("Category: ${team.category}")
+                Text("Players: ${team.players.size}")
+            }
+        },
+        buttons = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = onViewPlayers,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Person, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("View Players")
+                }
+                Button(
+                    onClick = onEdit,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Edit Team")
+                }
+                Button(
+                    onClick = onDelete,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE53935)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Delete Team")
+                }
+            }
+        },
+        modifier = TODO(),
+        properties = TODO(),
+        content = TODO()
+    )
+}@Composable
+fun TeamPlayersScreen(navController: NavController, teamId: String) {
+    val db = FirebaseFirestore.getInstance()
+    var team by remember { mutableStateOf<Team?>(null) }
+    var players by remember { mutableStateOf<List<User>>(emptyList()) }
+
+    LaunchedEffect(teamId) {
+        // Fetch team
+        val teamSnapshot = db.collection("teams").document(teamId).get().await()
+        team = teamSnapshot.toObject(Team::class.java)
+
+        // Fetch players
+        if (team?.players?.isNotEmpty() == true) {
+            val playersList = mutableListOf<User>()
+            for (playerId in team!!.players) {
+                val playerSnapshot = db.collection("users").document(playerId).get().await()
+                playerSnapshot.toObject(User::class.java)?.let { playersList.add(it) }
+            }
+            players = playersList
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(team?.name ?: "Team Players") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        LazyColumn(modifier = Modifier.padding(padding)) {
+            items(players) { player ->
+                PlayerItem(player = player)
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerItem(player: User) {
+    Card(modifier = Modifier.padding(8.dp)) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(16.dp)
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = team.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = player.name, fontWeight = FontWeight.Bold)
+                Text(text = player.email)
+            }
+        }
+    }
+}
+@Composable
+fun EditTeamScreen(navController: NavController, teamId: String) {
+    val db = FirebaseFirestore.getInstance()
+    var team by remember { mutableStateOf<Team?>(null) }
 
-                Spacer(modifier = Modifier.height(24.dp))
+    var teamName by remember { mutableStateOf("") }
+    var ageGroup by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    // Update Button
-                    Button(
-                        onClick = onUpdate,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3498DB)
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Update")
+    LaunchedEffect(teamId) {
+        val teamSnapshot = db.collection("teams").document(teamId).get().await()
+        team = teamSnapshot.toObject(Team::class.java)
+        team?.let {
+            teamName = it.name
+            ageGroup = it.ageGroup
+            category = it.category
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Edit Team") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-
-                    // Delete Button
-                    Button(
-                        onClick = onDelete,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFE74C3C)
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Delete")
+                },
+                actions = {
+                    IconButton(onClick = {
+                        team?.let { currentTeam ->
+                            val updatedTeam = currentTeam.copy(
+                                name = teamName,
+                                ageGroup = ageGroup,
+                                category = category
+                            )
+                            db.collection("teams").document(teamId).set(updatedTeam)
+                            navController.navigateUp()
+                        }
+                    }) {
+                        Icon(Icons.Default.Save, contentDescription = "Save")
                     }
                 }
-            }
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
+            OutlinedTextField(
+                value = teamName,
+                onValueChange = { teamName = it },
+                label = { Text("Team Name") },
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            )
+            OutlinedTextField(
+                value = ageGroup,
+                onValueChange = { ageGroup = it },
+                label = { Text("Age Group") },
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            )
+            OutlinedTextField(
+                value = category,
+                onValueChange = { category = it },
+                label = { Text("Category") },
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            )
         }
     }
 }

@@ -1,63 +1,73 @@
 package com.example.hockeynamibiaorg.ui.auth
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.hockeynamibiaorg.data.models.User
+import com.example.hockeynamibiaorg.data.repositories.AuthService
+import com.example.hockeynamibiaorg.data.repositories.UserService
 import com.example.hockeynamibiaorg.ui.common.AppTextField
 import com.example.hockeynamibiaorg.ui.common.PrimaryButton
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
-    // Create a scroll state to enable scrolling
-    val scrollState = rememberScrollState()
+    // Services
+    val authService = remember { AuthService() }
+    val userService = remember { UserService() }
 
+    // Coroutine scope
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    // Form states
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // Role dropdown
+    var expandedRole by remember { mutableStateOf(false) }
+    var selectedRole by remember { mutableStateOf("Player") }
+    val roles = listOf("Player", "Coach")
+
+    // Age group and category dropdowns
     var expandedGroup by remember { mutableStateOf(false) }
     var expandedCategory by remember { mutableStateOf(false) }
     var selectedGroup by remember { mutableStateOf("U-18") }
     var selectedCategory by remember { mutableStateOf("Indoor") }
-    val ageGroup = listOf("U-18", "U-20", "Senior")
-    val category = listOf("Indoor", "Outdoor", "Mixed")
+    val ageGroups = listOf("U-18", "U-20", "Senior")
+    val categories = listOf("Indoor", "Outdoor", "Mixed")
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    var age by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp)
-                // Add verticalScroll modifier with the scroll state
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top // Change to Top to start from the top
+            verticalArrangement = Arrangement.Top
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -68,10 +78,20 @@ fun RegisterScreen(navController: NavController) {
                 fontSize = 24.sp
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             AppTextField(
                 label = "Your Name",
+                value = name,
+                onValueChange = { name = it },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -79,13 +99,56 @@ fun RegisterScreen(navController: NavController) {
 
             AppTextField(
                 label = "Your Email",
+                value = email,
+                onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Gender dropdown
+            ExposedDropdownMenuBox(
+                expanded = expandedRole,
+                onExpandedChange = { expandedRole = !expandedRole },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = selectedRole,
+                    onValueChange = {},
+                    readOnly = true,
+                    shape = RoundedCornerShape(12.dp),
+                    label = { Text("Select Role") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRole) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedRole,
+                    onDismissRequest = { expandedRole = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    roles.forEach { role ->
+                        DropdownMenuItem(
+                            text = { Text(text = role) },
+                            onClick = {
+                                selectedRole = role
+                                expandedRole = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Gender field
             AppTextField(
                 label = "Gender",
+                value = gender,
+                onValueChange = { gender = it },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -107,7 +170,6 @@ fun RegisterScreen(navController: NavController) {
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .menuAnchor()
                 )
 
@@ -116,11 +178,11 @@ fun RegisterScreen(navController: NavController) {
                     onDismissRequest = { expandedGroup = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ageGroup.forEach { role ->
+                    ageGroups.forEach { group ->
                         DropdownMenuItem(
-                            text = { Text(text = role) },
+                            text = { Text(text = group) },
                             onClick = {
-                                selectedGroup = role
+                                selectedGroup = group
                                 expandedGroup = false
                             }
                         )
@@ -146,7 +208,6 @@ fun RegisterScreen(navController: NavController) {
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .menuAnchor()
                 )
 
@@ -155,11 +216,11 @@ fun RegisterScreen(navController: NavController) {
                     onDismissRequest = { expandedCategory = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    category.forEach { role ->
+                    categories.forEach { cat ->
                         DropdownMenuItem(
-                            text = { Text(text = role) },
+                            text = { Text(text = cat) },
                             onClick = {
-                                selectedCategory = role
+                                selectedCategory = cat
                                 expandedCategory = false
                             }
                         )
@@ -170,6 +231,26 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             AppTextField(
+                label = "Age",
+                value = age,
+                onValueChange = { age = it.filter { char -> char.isDigit() } },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AppTextField(
+                label = "Phone Number",
+                value = phone,
+                onValueChange = { phone = it },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AppTextField(
+                value = password,
+                onValueChange = { password = it },
                 label = "Password",
                 isPassword = true,
                 modifier = Modifier.fillMaxWidth()
@@ -179,6 +260,8 @@ fun RegisterScreen(navController: NavController) {
 
             AppTextField(
                 label = "Re-Password",
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
                 isPassword = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -186,11 +269,72 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(32.dp))
 
             PrimaryButton(
-                text = "Sign Up",
-                modifier = Modifier.fillMaxWidth()
+                text = if (isLoading) "Creating Account..." else "Sign Up",
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
-                navController.navigate("home") {
-                    popUpTo("welcome") { inclusive = true }
+                // Validate inputs
+                if (name.isBlank() || email.isBlank() || gender.isBlank() ||
+                    password.isBlank() || confirmPassword.isBlank() || age.isBlank() || phone.isBlank()) {
+                    errorMessage = "Please fill in all fields"
+                    return@PrimaryButton
+                }
+
+                val parsedAge = age.toIntOrNull()
+                if (parsedAge == null || parsedAge <= 0 || parsedAge > 100) {
+                    errorMessage = "Please enter a valid age (1–100)"
+                    return@PrimaryButton
+                }
+
+                if (password != confirmPassword) {
+                    errorMessage = "Passwords don't match"
+                    return@PrimaryButton
+                }
+
+                if (password.length < 6) {
+                    errorMessage = "Password should be at least 6 characters"
+                    return@PrimaryButton
+                }
+
+                isLoading = true
+                errorMessage = null
+
+                scope.launch {
+                    try {
+                        // 1. Create auth user
+
+
+                        // 2. Create user document in Firestore
+                        val user = User(
+                           // id = userId,
+                            username = email,
+                            fullName = name,
+                            email = email,
+                            role = selectedRole.lowercase(),
+                            age = parsedAge,
+                            gender = gender,
+                            category = selectedCategory,
+                            ageGroup = selectedGroup,
+                            phone = phone,
+                            password = password,
+                            profileImageUrl = ""
+                        )
+
+                        val success = userService.createUser(user)
+
+                        if (success) {
+                            // Navigate to home on success
+                            navController.navigate("login") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        } else {
+                            errorMessage = "Failed to save user data"
+                            isLoading = false
+                        }
+                    } catch (e: Exception) {
+                        errorMessage = e.message ?: "Registration failed"
+                        isLoading = false
+                    }
                 }
             }
 
@@ -203,7 +347,6 @@ fun RegisterScreen(navController: NavController) {
                 navController.navigate("login")
             }
 
-            // Add extra space at the bottom to ensure the last elements are visible when scrolled
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
