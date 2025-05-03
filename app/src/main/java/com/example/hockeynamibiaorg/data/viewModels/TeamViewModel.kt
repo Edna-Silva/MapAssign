@@ -1,6 +1,6 @@
 package com.example.hockeynamibiaorg.data.viewModels
 
-
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hockeynamibiaorg.data.models.Event
@@ -14,25 +14,17 @@ import kotlinx.coroutines.launch
 
 class TeamViewModel : ViewModel() {
     private val db = Firebase.firestore
-
     private val _teams = MutableStateFlow<List<Team>>(emptyList())
     val teams: StateFlow<List<Team>> = _teams
 
-    private val _players = MutableStateFlow<List<Player>>(emptyList())
-    val players: StateFlow<List<Player>> = _players
-
-    private val _events = MutableStateFlow<List<Event>>(emptyList())
-    val events: StateFlow<List<Event>> = _events
-
-    init {
-        loadTeams()
-    }
-
-    private fun loadTeams() {
+    fun loadTeams() {
         viewModelScope.launch {
             db.collection("teams")
                 .addSnapshotListener { snapshot, error ->
-                    if (error != null) return@addSnapshotListener
+                    if (error != null) {
+                        Log.e("TeamViewModel", "Error loading teams", error)
+                        return@addSnapshotListener
+                    }
 
                     val teamList = snapshot?.documents?.mapNotNull { doc ->
                         doc.toObject(Team::class.java)?.copy(id = doc.id)
@@ -40,6 +32,48 @@ class TeamViewModel : ViewModel() {
 
                     _teams.value = teamList
                 }
+        }
+    }
+
+    fun deleteTeam(teamId: String) {
+        viewModelScope.launch {
+            try {
+                db.collection("teams").document(teamId).delete()
+            } catch (e: Exception) {
+                Log.e("TeamViewModel", "Error deleting team", e)
+            }
+        }
+    }
+
+    fun registerTeam(
+        name: String,
+        ageGroup: String,
+        gender: String,
+        category: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            try {
+                val newTeam = Team(
+                    name = name,
+                    ageGroup = ageGroup,
+                    gender = gender,
+                    category = category
+                )
+
+                db.collection("teams")
+                    .add(newTeam)
+                    .addOnSuccessListener {
+                        loadTeams() // Refresh the teams list
+                        onSuccess()
+                    }
+                    .addOnFailureListener { e ->
+                        onFailure(e)
+                    }
+            } catch (e: Exception) {
+                onFailure(e)
+            }
         }
     }
 
@@ -74,18 +108,6 @@ class TeamViewModel : ViewModel() {
         }
 
         return result
-    }
-
-    fun registerTeam(name: String, ageGroup: String, gender: String, hockeyType: String) {
-        viewModelScope.launch {
-            val newTeam = Team(
-                name = name,
-                ageGroup = ageGroup,
-                gender = gender,
-                hockeyType = hockeyType
-            )
-            db.collection("teams").add(newTeam)
-        }
     }
 
     fun updatePlayerTeam(playerId: String, newTeamId: String) {

@@ -1,13 +1,14 @@
 package com.example.hockeynamibiaorg.ui.coach
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,52 +16,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Team
+import com.example.hockeynamibiaorg.data.models.User
 import com.example.hockeynamibiaorg.ui.theme.Purple80
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeamScreen(navController: NavController) {
-    val db = FirebaseFirestore.getInstance()
-    val auth = FirebaseAuth.getInstance()
-    val currentUserId = auth.currentUser?.uid ?: ""
 
-    var teams by remember { mutableStateOf<List<Team>>(emptyList()) }
+fun TeamScreen(navController: NavController) {
+    val teamViewModel: TeamViewModel = viewModel()
+    val context = LocalContext.current
+    val teams by teamViewModel.teams.collectAsState()
+
+    // Keep all your existing state variables
     var showAddTeamDialog by remember { mutableStateOf(false) }
     var selectedTeam by remember { mutableStateOf<Team?>(null) }
     var showTeamDialog by remember { mutableStateOf(false) }
 
-    // Fetch teams for the current coach
-    LaunchedEffect(currentUserId) {
-        if (currentUserId.isNotEmpty()) {
-            db.collection("teams")
-                .whereEqualTo("coachId", currentUserId)
-                .get()
-                .addOnSuccessListener { result ->
-                    teams = result.toObjects(Team::class.java)
-                }
-        }
+    // Load teams when screen appears (now using ViewModel)
+    LaunchedEffect(Unit) {
+        teamViewModel.loadTeams()
     }
 
+    // Keep your exact same Scaffold and UI structure
     Scaffold(
         topBar = {
+            // Keep your exact TopAppBar implementation
             TopAppBar(
                 title = { Text("Team Management") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -79,88 +76,89 @@ fun TeamScreen(navController: NavController) {
             }
         }
     ) { paddingValues ->
+        // Keep your exact Column layout
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp))
-                {
-                    Text(
-                        text = "Your Hockey Teams",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Your Hockey Teams",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
-                    if (teams.isEmpty()) {
-                        Text(
-                            text = "No teams yet. Click the + button to add a team.",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(teams) { team ->
-                                TeamCard(
-                                    team = team,
-                                    onClick = {
-                                        selectedTeam = team
-                                        showTeamDialog = true
-                                    }
-                                )
+            if (teams.isEmpty()) {
+                Text(
+                    text = "No teams yet. Click the + button to add a team.",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(teams) { team ->
+                        TeamCard(
+                            team = team,
+                            onClick = {
+                                selectedTeam = team
+                                showTeamDialog = true
                             }
-                        }
+                        )
                     }
                 }
-
-            // Add Team Dialog
-            if (showAddTeamDialog) {
-                AddTeamDialog(
-                    onDismiss = { showAddTeamDialog = false },
-                    onSave = { teamName, ageGroup, category ->
-                        val newTeam = Team(
-                            id = db.collection("teams").document().id,
-                            name = teamName,
-                            ageGroup = ageGroup,
-                            category = category,
-                            coachId = currentUserId
-                        )
-                        db.collection("teams").document(newTeam.id).set(newTeam)
-                        showAddTeamDialog = false
-                    }
-                )
             }
+        }
 
-            // Team Actions Dialog
-            if (showTeamDialog && selectedTeam != null) {
-                TeamActionsDialog(
-                    team = selectedTeam!!,
-                    onDismiss = {
-                        showTeamDialog = false
-                        selectedTeam = null
-                    },
-                    onDelete = {
-                        db.collection("teams").document(selectedTeam!!.id).delete()
-                        showTeamDialog = false
-                        selectedTeam = null
-                    },
-                    onEdit = {
-                        // This would navigate to an edit screen
-                        navController.navigate("editTeam/${selectedTeam?.id}")
-                        showTeamDialog = false
-                    },
-                    onViewPlayers = {
-                        navController.navigate("teamPlayers/${selectedTeam?.id}")
-                        showTeamDialog = false
-                    }
-                )
-            }
+        // Keep your dialogs but update their actions to use ViewModel
+        if (showAddTeamDialog) {
+            AddTeamDialog(
+                onDismiss = { showAddTeamDialog = false },
+                onSave = { teamName, ageGroup, category ->
+                    teamViewModel.registerTeam(
+                        name = teamName,
+                        ageGroup = ageGroup,
+                        gender = "", // Add gender later
+                        category = category,
+                        onSuccess = {
+                            Toast.makeText(context, "Team created successfully", Toast.LENGTH_SHORT).show()
+                        },
+                        onFailure = { e ->
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            )
+        }
+
+        if (showTeamDialog && selectedTeam != null) {
+            TeamActionsDialog(
+                team = selectedTeam!!,
+                onDismiss = {
+                    showTeamDialog = false
+                    selectedTeam = null
+                },
+                onDelete = {
+                    teamViewModel.deleteTeam(selectedTeam!!.id)
+                    showTeamDialog = false
+                    selectedTeam = null
+                },
+                onEdit = {
+                    navController.navigate("editTeam/${selectedTeam?.id}")
+                    showTeamDialog = false
+                },
+                onViewPlayers = {
+                    navController.navigate("teamPlayers/${selectedTeam?.id}")
+                    showTeamDialog = false
+                }
+            )
+        }
     }
 }
-
 @Composable
 fun TeamCard(team: Team, onClick: () -> Unit) {
     Card(
@@ -223,9 +221,14 @@ fun AddTeamDialog(
     onDismiss: () -> Unit,
     onSave: (String, String, String) -> Unit
 ) {
+    val teamViewModel: TeamViewModel = viewModel() // Get the ViewModel instance
+    val context = LocalContext.current // Get context in Compose
+
     var teamName by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
     var ageGroup by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -252,13 +255,46 @@ fun AddTeamDialog(
                     label = { Text("Category (Indoor/Outdoor/Mixed)") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = gender,
+                    onValueChange = { gender = it },
+                    label = { Text("Gender (Fenale/Male") },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (teamName.isNotBlank() && ageGroup.isNotBlank() && category.isNotBlank()) {
-                        onSave(teamName, ageGroup, category)
+                        teamViewModel.registerTeam(  // Call on the instance, not the class
+                            name = teamName,
+                            ageGroup = ageGroup,
+                            gender = gender,
+                            category = category,
+                            onSuccess = {
+                                // Show success message or navigate
+                                Toast.makeText(
+                                    context,
+                                    "Team registered successfully!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                onSave(
+                                    teamName,
+                                    ageGroup,
+                                    category
+                                ) // Call this after successful registration
+                            },
+                            onFailure = { e ->
+                                // Show error message
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        )
+                    } else {
+                        Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
@@ -294,7 +330,8 @@ fun TeamActionsDialog(
                 Text("Players: ${team.players.size}")
             }
         },
-        buttons = {
+        confirmButton = {
+            // Buttons go here
             Column(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = onViewPlayers,
@@ -325,11 +362,14 @@ fun TeamActionsDialog(
                 }
             }
         },
-        modifier = TODO(),
-        properties = TODO(),
-        content = TODO()
+        modifier = Modifier, // Add your modifier here or remove if not needed
+        // properties = DialogProperties() // Uncomment if you need custom properties
     )
-}@Composable
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun TeamPlayersScreen(navController: NavController, teamId: String) {
     val db = FirebaseFirestore.getInstance()
     var team by remember { mutableStateOf<Team?>(null) }
@@ -357,7 +397,7 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
                 title = { Text(team?.name ?: "Team Players") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -372,7 +412,7 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
 }
 
 @Composable
-fun PlayerItem(player: User) {
+fun  PlayerItem(player: User) {
     Card(modifier = Modifier.padding(8.dp)) {
         Row(
             modifier = Modifier
@@ -387,12 +427,13 @@ fun PlayerItem(player: User) {
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = player.name, fontWeight = FontWeight.Bold)
+                Text(text = player.fullName, fontWeight = FontWeight.Bold)
                 Text(text = player.email)
             }
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTeamScreen(navController: NavController, teamId: String) {
     val db = FirebaseFirestore.getInstance()
@@ -418,7 +459,7 @@ fun EditTeamScreen(navController: NavController, teamId: String) {
                 title = { Text("Edit Team") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -433,7 +474,7 @@ fun EditTeamScreen(navController: NavController, teamId: String) {
                             navController.navigateUp()
                         }
                     }) {
-                        Icon(Icons.Default.Save, contentDescription = "Save")
+                        Icon(Icons.Default.Done, contentDescription = "Save")
                     }
                 }
             )
