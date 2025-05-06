@@ -1,3 +1,4 @@
+
 package com.example.hockeynamibiaorg.data.models
 data class Event(
     val id: String = "",
