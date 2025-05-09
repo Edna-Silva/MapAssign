@@ -427,7 +427,7 @@ fun  PlayerItem(player: User) {
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = player.fullName, fontWeight = FontWeight.Bold)
+                Text(text = player.firstName, fontWeight = FontWeight.Bold)
                 Text(text = player.email)
             }
         }

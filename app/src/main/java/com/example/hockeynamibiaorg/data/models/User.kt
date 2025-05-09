@@ -1,23 +1,16 @@
 package com.example.hockeynamibiaorg.data.models
 
-import com.google.firebase.Timestamp
-
 
 
 data class User(
     val id: String = "",
-    val username: String = "",
-    val fullName: String = "",
     val email: String = "",
-    val role: String = "player",
-    val age: Int = 0,
-    val gender: String = "",
-    val category: String = "",
-    val ageGroup: String = "",
-    val phone: String = "",
-    val password: String ="",
-    val profileImageUrl: String = ""
-){
-    // Empty constructor for Firebase
-   // constructor() : this("", "", "", "", "", 0, "", "", "")
-}
+    val firstName: String = "",
+    val lastName: String = "",
+    val role: String = "player", // "player" or "coach"
+    val phoneNumber: String = "",
+    // Add additional user fields as needed
+    val profileImageUrl: String = "",
+    val dateJoined: Long = System.currentTimeMillis(),
+    val isActive: Boolean = true
+)

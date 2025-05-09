@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,6 +79,10 @@ dependencies {
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")
+    implementation ("com.google.code.gson:gson:2.10.1") // or latest version
+
+    implementation ("com.google.firebase:firebase-auth-ktx")
+    implementation ("com.google.firebase:firebase-firestore-ktx")
 
     // FCM
     //implementation ("com.google.firebase:firebase-messaging:23.4.1")

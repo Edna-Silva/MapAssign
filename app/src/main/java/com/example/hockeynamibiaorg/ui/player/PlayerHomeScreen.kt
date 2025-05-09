@@ -23,11 +23,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
+import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -41,7 +43,7 @@ fun PlayerHomeScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            item { HeaderSection() }
+            item { HeaderSection(navController) }
             item { NewsUpdatesSection() }
             item { UpcomingMatchSection() }
         }
@@ -49,8 +51,9 @@ fun PlayerHomeScreen(navController: NavHostController) {
 }
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(navController: NavHostController) {  // Add navController parameter
     var searchQuery by remember { mutableStateOf("") }
+    val userViewModel : UserViewModel = viewModel()
 
     Column(
         modifier = Modifier
@@ -64,7 +67,27 @@ fun HeaderSection() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Logout Button
+            IconButton(
+                onClick = {
+                    // Handle logout logic here
+                    userViewModel.logout()
+                    navController.navigate("logout") {  // Replace "login" with your actual login route
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Logout",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp))
+            }
 
+            // Profile Image
             Surface(
                 modifier = Modifier.size(48.dp),
                 shape = CircleShape,
@@ -92,6 +115,7 @@ fun HeaderSection() {
         )
     }
 }
+
 
 @Composable
 fun NewsUpdatesSection() {
@@ -240,12 +264,12 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
                 modifier = Modifier.clickable { navController.navigate("player_events") },
                 tint = Color.White
             )
-           /* Icon(
-                imageVector = Icons.Default.Notifications,
-                contentDescription = "Notifications",
-                modifier = Modifier.clickable { navController.navigate("notifications") },
-                tint = Color.White
-            )*/
+            /* Icon(
+                 imageVector = Icons.Default.Notifications,
+                 contentDescription = "Notifications",
+                 modifier = Modifier.clickable { navController.navigate("notifications") },
+                 tint = Color.White
+             )*/
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile",
