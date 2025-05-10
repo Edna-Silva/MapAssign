@@ -20,27 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.hockeynamibiaorg.data.models.Event
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
-// Data classes for events
-data class Event(
-    val id: String,
-    val title: String,
-    val date: LocalDate,
-    val startTime: String,
-    val endTime: String,
-    val progress: Int,
-    val description: String
-)
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun EventManagementScreen(navController: NavController) {
+fun EventManagementScreen(
+    navController: NavController,
+    coachViewModel: com.example.hockeynamibiaorg.data.viewModels.CoachViewModel
+) {
     // State variables
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -48,28 +39,15 @@ fun EventManagementScreen(navController: NavController) {
     var showAddEventDialog by remember { mutableStateOf(false) }
     var showEventDetails by remember { mutableStateOf(false) }
 
-    // Sample events
-    val events = remember {
-        mutableStateListOf(
-            Event(
-                id = "1",
-                title = "App Design",
-                date = LocalDate.of(2022, 7, 2),
-                startTime = "07:00",
-                endTime = "12:00",
-                progress = 50,
-                description = "Design the new hockey app interface"
-            ),
-            Event(
-                id = "2",
-                title = "Team Meeting",
-                date = LocalDate.of(2022, 7, 15),
-                startTime = "14:00",
-                endTime = "16:00",
-                progress = 20,
-                description = "Discuss tournament strategy"
-            )
-        )
+    val events by coachViewModel.events.collectAsState()
+
+    val filteredEvents = events.filter { event ->
+        val eventDate = java.time.LocalDate.parse(event.date)
+        eventDate.year == currentMonth.year && eventDate.monthValue == currentMonth.monthValue
+    }
+
+    val eventsForSelectedDate = events.filter { event ->
+        event.date == selectedDate.toString()
     }
 
     // Main screen content
@@ -159,7 +137,7 @@ fun EventManagementScreen(navController: NavController) {
                                     .clickable {
                                         day?.let {
                                             selectedDate = currentMonth.atDay(it)
-                                            val eventForDay = events.find { it.date == selectedDate }
+                                            val eventForDay = eventsForSelectedDate.find { it.date == selectedDate.toString() }
                                             if (eventForDay != null) {
                                                 selectedEvent = eventForDay
                                                 showEventDetails = true
@@ -170,14 +148,17 @@ fun EventManagementScreen(navController: NavController) {
                             ) {
                                 day?.let {
                                     val date = currentMonth.atDay(it)
-                                    val hasEvent = events.any { event -> event.date == date }
+                                    val hasEvent = filteredEvents.any { event -> 
+                                        val eventDate = java.time.LocalDate.parse(event.date)
+                                        eventDate == date
+                                    }
 
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
                                             text = it.toString(),
                                             color = when {
                                                 date == selectedDate -> Color.White
-                                                date == LocalDate.now() -> MaterialTheme.colorScheme.primary
+                                                date == java.time.LocalDate.now() -> MaterialTheme.colorScheme.primary
                                                 else -> Color.Black
                                             },
                                             modifier = Modifier
@@ -208,9 +189,8 @@ fun EventManagementScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Events for selected date
-                val dayEvents = events.filter { it.date == selectedDate }
-                if (dayEvents.isNotEmpty()) {
-                    dayEvents.forEach { event ->
+                if (eventsForSelectedDate.isNotEmpty()) {
+                    eventsForSelectedDate.forEach { event ->
                         EventCard(
                             event = event,
                             onCardClick = {
@@ -237,7 +217,7 @@ fun EventManagementScreen(navController: NavController) {
         AddEventDialog(
             onDismiss = { showAddEventDialog = false },
             onConfirm = { newEvent ->
-                events.add(newEvent)
+                coachViewModel.addEvent(newEvent)
                 showAddEventDialog = false
             },
             initialDate = selectedDate
@@ -250,14 +230,11 @@ fun EventManagementScreen(navController: NavController) {
             event = selectedEvent!!,
             onDismiss = { showEventDetails = false },
             onDelete = { event ->
-                events.remove(event)
+                coachViewModel.deleteEvent(event.id)
                 showEventDetails = false
             },
             onUpdate = { updatedEvent ->
-                val index = events.indexOfFirst { it.id == updatedEvent.id }
-                if (index != -1) {
-                    events[index] = updatedEvent
-                }
+                coachViewModel.updateEvent(updatedEvent)
                 showEventDetails = false
             }
         )
@@ -279,20 +256,14 @@ fun EventCard(event: Event, onCardClick: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "${event.startTime} - ${event.endTime}")
+            Text(text = event.time)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "${event.progress}% complete")
-            LinearProgressIndicator(
-                progress = event.progress / 100f,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .padding(top = 8.dp)
-            )
+            Text(text = event.description)
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddEventDialog(
     onDismiss: () -> Unit,
@@ -300,10 +271,8 @@ fun AddEventDialog(
     initialDate: LocalDate
 ) {
     var title by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf(initialDate) }
-    var startTime by remember { mutableStateOf("") }
-    var endTime by remember { mutableStateOf("") }
-    var progress by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf(initialDate.format(DateTimeFormatter.ISO_LOCAL_DATE)) }
+    var time by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -318,25 +287,10 @@ fun AddEventDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                // Add date picker, time pickers, and other fields here
                 OutlinedTextField(
-                    value = startTime,
-                    onValueChange = { startTime = it },
-                    label = { Text("Start Time (HH:MM)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = endTime,
-                    onValueChange = { endTime = it },
-                    label = { Text("End Time (HH:MM)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = progress,
-                    onValueChange = { progress = it },
-                    label = { Text("Progress (0-100)") },
+                    value = time,
+                    onValueChange = { time = it },
+                    label = { Text("Time (e.g. 14:00 - 16:00)") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -355,10 +309,10 @@ fun AddEventDialog(
                         id = System.currentTimeMillis().toString(),
                         title = title,
                         date = date,
-                        startTime = startTime,
-                        endTime = endTime,
-                        progress = progress.toIntOrNull() ?: 0,
-                        description = description
+                        time = time,
+                        description = description,
+                        teamId = "" ,
+                        type = ""
                     )
                     onConfirm(newEvent)
                 }
@@ -398,26 +352,17 @@ fun EventDetailsDialog(
                     )
                     // Add other editable fields similarly
                 }
-            } else {
-                Column {
-                    Text("Title: ${event.title}", fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Date: ${event.date}")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Time: ${event.startTime} - ${event.endTime}")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Progress: ${event.progress}%")
-                    LinearProgressIndicator(
-                        progress = event.progress / 100f,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .padding(top = 8.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Description: ${event.description}")
+                } else {
+                    Column {
+                        Text("Title: ${event.title}", fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Date: ${event.date}")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Time: ${event.time}")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Description: ${event.description}")
+                    }
                 }
-            }
         },
         confirmButton = {
             if (isEditing) {

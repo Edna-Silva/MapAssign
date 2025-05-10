@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
     val navController = rememberNavController()
+    val coachViewModel: com.example.hockeynamibiaorg.data.viewModels.CoachViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
     NavHost(
         navController = navController,
@@ -107,11 +108,12 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
             TeamScreen(navController)
         }
         composable(Navigation.Events.route) {
-            EventManagementScreen(navController)
+            EventManagementScreen(navController, coachViewModel)
         }
         composable(Navigation.PlayerManagement.route) {
             PlayerManagementScreen(navController)
         }
+
 
         // Dynamic Routes
         composable("teamPlayers/{teamId}") { backStackEntry ->

@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -32,11 +33,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.ui.theme.Purple80
 import com.example.hockeynamibiaorg.ui.theme.Purple80
-
+import com.example.hockeynamibiaorg.data.models.Event
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventEntriesScreen(navController: NavController) {
+fun EventEntriesScreen(
+    navController: NavController,
+    coachViewModel: com.example.hockeynamibiaorg.data.viewModels.CoachViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val events = coachViewModel.events.collectAsState().value
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,7 +79,7 @@ fun EventEntriesScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn {
-                items(getSampleEvents()) { event ->
+                items(events) { event ->
                     EventCard(event = event)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -82,22 +88,7 @@ fun EventEntriesScreen(navController: NavController) {
     }
 }
 
-data class Event(
-    val name: String,
-    val date: String,
-    val location: String,
 
-)
-
-fun getSampleEvents(): List<Event> {
-    return listOf(
-        Event("National Tournament", "May 15, 2025", "Windhoek National Stadium"),
-        Event("Regional Championship", "June 23, 2025", "Swakopmund Sports Center"),
-        Event("Youth Hockey Camp", "July 10, 2025", "Windhoek Hockey Club"),
-        Event("League Season Opening", "August 5, 2025", "Various Locations"),
-        Event("League Season Opening", "August 5, 2025", "Various Locations")
-    )
-}
 
 @Composable
 fun EventCard(event: Event) {
@@ -111,7 +102,7 @@ fun EventCard(event: Event) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = event.name,
+                text = event.title,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -122,13 +113,13 @@ fun EventCard(event: Event) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = "Location: ${event.location}")
+            Text(text = "Description: ${event.description}")
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            }
         }
     }
+}
 
 
 
