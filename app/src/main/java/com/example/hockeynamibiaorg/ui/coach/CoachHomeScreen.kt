@@ -35,11 +35,7 @@ import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
 // Reusing the same color palette from player screen
-val DarkBlue = Color(0xFF142143)
-val GoldYellow = Color(0xFFFFAF00)
-val LightGray = Color(0xFFE4E4E4)
-val BlueAccent = Color(0xFF1A5D94)
-val LighterBlue = Color(0xFF2A6DA4)
+
 
 data class NewsItem(val title: String, val description: String, val url: String)
 data class MatchItem(val teams: String, val dateTime: String, val venue: String)

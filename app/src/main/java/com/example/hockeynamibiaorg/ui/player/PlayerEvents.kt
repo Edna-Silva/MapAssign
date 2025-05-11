@@ -109,6 +109,34 @@ fun EventEntriesScreen(navController: NavController, eventViewModel: EventViewMo
                     singleLine = true
                 )
 
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color(0xFF142143), Color(0xFF3F5291))
+                            )
+                        )
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "Upcoming Events",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Discover hockey events in Namibia",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 14.sp
+
+                        )
+                    }
+                }
+
                 // Filter chips
                 Row(
                     modifier = Modifier
@@ -242,7 +270,7 @@ fun ModernEventCard(event: Event) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = event.type,
+                            text = event.location,
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
