@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,11 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
-<<<<<<< HEAD
-=======
-// Reusing the same color palette from player screen
 
->>>>>>> 7f18a7290a3e70b54abeb6281df7a062219d092d
 
 data class NewsItem(val title: String, val description: String, val url: String)
 data class MatchItem(val teams: String, val dateTime: String, val venue: String)
@@ -105,7 +103,7 @@ fun CoachHeaderSection(navController: NavController) {
                 brush = Brush.verticalGradient(
                     colors = listOf(DarkBlue, BlueAccent)
                 )
-            )) {
+            ) ){
                 Column {
                     Row(
                         modifier = Modifier
@@ -392,7 +390,7 @@ fun CoachMatchCard(match: MatchItem) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Home,
+                        imageVector = Icons.Default.Lock,
                         contentDescription = "Match",
                         tint = LighterBlue,
                         modifier = Modifier.size(20.dp)
