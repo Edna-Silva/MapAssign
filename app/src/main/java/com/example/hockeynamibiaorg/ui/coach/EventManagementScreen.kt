@@ -300,6 +300,7 @@ fun AddEventDialog(
     var time by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -335,6 +336,13 @@ fun AddEventDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
+                    value = location,
+                    onValueChange = { location = it },
+                    label = { Text("Location") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text("Description") },
@@ -345,16 +353,17 @@ fun AddEventDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val newEvent = Event(
-                        id = "",
-                        teamId = "",
-                        title = title,
-                        description = description,
-                        date = date,
-                        time = time,
-                        type = type
-                    )
-                    onConfirm(newEvent)
+                val newEvent = Event(
+                    id = "",
+                    teamId = "",
+                    title = title,
+                    description = description,
+                    date = date,
+                    time = time,
+                    type = type,
+                    location = location
+                )
+                onConfirm(newEvent)
                 }
             ) {
                 Text("Add")

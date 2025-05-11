@@ -32,6 +32,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
+<<<<<<< HEAD
+=======
+// Reusing the same color palette from player screen
+
+>>>>>>> 7f18a7290a3e70b54abeb6281df7a062219d092d
 
 data class NewsItem(val title: String, val description: String, val url: String)
 data class MatchItem(val teams: String, val dateTime: String, val venue: String)
