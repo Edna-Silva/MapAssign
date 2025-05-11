@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hockeynamibiaorg.R
 
+
+
 data class HockeyPlayer(
     val name: String,
     val number: Int,
@@ -55,14 +57,14 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(Color.White)
     ) {
-        // Header with team colors
+        // Header with team colors - updated to DarkBlue
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(Color(0xFF003366))
+                .background(DarkBlue)
         ) {
             Text(
                 text = player.team,
@@ -70,7 +72,6 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center))
-
         }
 
         // Player image and basic info
@@ -87,7 +88,7 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
-                    .border(3.dp, Color(0xFFCC0000), CircleShape)
+                    .border(3.dp, GoldYellow, CircleShape) // Updated to GoldYellow
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -95,19 +96,20 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
             Column {
                 Text(
                     text = "#${player.number}",
-                    color = Color(0xFFCC0000),
+                    color = GoldYellow, // Updated to GoldYellow
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = player.name,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = DarkBlue // Updated to DarkBlue
                 )
                 Text(
                     text = player.position,
                     fontSize = 18.sp,
-                    color = Color.Gray
+                    color = BlueAccent // Updated to BlueAccent
                 )
             }
         }
@@ -118,7 +120,8 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .clickable { showEditDialog = true },
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = LighterBlue) // Updated to LighterBlue
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -132,7 +135,8 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                         text = "Player Details",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        color = DarkBlue // Updated to DarkBlue
                     )
                     IconButton(
                         onClick = { showEditDialog = true },
@@ -141,7 +145,7 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit Details",
-                            tint = Color(0xFF003366)
+                            tint = DarkBlue // Updated to DarkBlue
                         )
                     }
                 }
@@ -152,12 +156,13 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
             }
         }
 
-        // Stats card (unchanged from original)
+        // Stats card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = LighterBlue) // Updated to LighterBlue
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -166,7 +171,8 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                     text = "Season Stats",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = DarkBlue // Updated to DarkBlue
                 )
 
                 StatRow("Goals", player.stats.goals.toString())
@@ -178,14 +184,15 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
         }
     }
 
-    // Edit Dialog
+    // Edit Dialog (colors updated to match theme)
     if (showEditDialog) {
         Dialog(onDismissRequest = { showEditDialog = false }) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = LighterBlue) // Updated to LighterBlue
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -193,7 +200,8 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                     Text(
                         text = "Edit Player Details",
                         style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        color = DarkBlue // Updated to DarkBlue
                     )
 
                     OutlinedTextField(
@@ -248,9 +256,9 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                     ) {
                         Button(
                             onClick = { showEditDialog = false },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                            colors = ButtonDefaults.buttonColors(containerColor = LighterBlue) // Updated to LighterBlue
                         ) {
-                            Text("Cancel")
+                            Text("Cancel", color = DarkBlue) // Updated to DarkBlue
                         }
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -259,9 +267,10 @@ fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit =
                             onClick = {
                                 onPlayerUpdate(editablePlayer)
                                 showEditDialog = false
-                            }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = GoldYellow) // Updated to GoldYellow
                         ) {
-                            Text("Save")
+                            Text("Save", color = DarkBlue) // Updated to DarkBlue
                         }
                     }
                 }
@@ -278,8 +287,8 @@ fun DetailRow(label: String, value: String) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, fontWeight = FontWeight.Bold)
-        Text(text = value)
+        Text(text = label, fontWeight = FontWeight.Bold, color = DarkBlue) // Updated to DarkBlue
+        Text(text = value, color = DarkBlue) // Updated to DarkBlue
     }
 }
 
@@ -294,14 +303,16 @@ fun StatRow(statName: String, value: String) {
         Text(
             text = statName,
             modifier = Modifier.weight(1f),
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            color = DarkBlue // Updated to DarkBlue
         )
         Text(
             text = value,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            color = DarkBlue // Updated to DarkBlue
         )
     }
 }

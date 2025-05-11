@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -15,7 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,43 +28,47 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Team
 import com.example.hockeynamibiaorg.data.models.User
-import com.example.hockeynamibiaorg.ui.theme.Purple80
-import com.google.firebase.auth.FirebaseAuth
+import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
+
+// Define color palette to match PlayerHomeScreen
+val DarkBlue = Color(0xFF0D3B66)
+val BlueAccent = Color(0xFF2A6EBB)
+val LighterBlue = Color(0xFF4A90E2)
+val GoldYellow = Color(0xFFFFD166)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun TeamScreen(navController: NavController) {
     val teamViewModel: TeamViewModel = viewModel()
     val context = LocalContext.current
     val teams by teamViewModel.teams.collectAsState()
 
-    // Keep all your existing state variables
     var showAddTeamDialog by remember { mutableStateOf(false) }
     var selectedTeam by remember { mutableStateOf<Team?>(null) }
     var showTeamDialog by remember { mutableStateOf(false) }
 
-    // Load teams when screen appears (now using ViewModel)
     LaunchedEffect(Unit) {
         teamViewModel.loadTeams()
     }
 
-    // Keep your exact same Scaffold and UI structure
     Scaffold(
         topBar = {
-            // Keep your exact TopAppBar implementation
             TopAppBar(
-                title = { Text("Team Management") },
+                title = {
+                    Text(
+                        "Team Management",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Purple80,
+                    containerColor = DarkBlue,
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
                 )
@@ -70,39 +77,84 @@ fun TeamScreen(navController: NavController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showAddTeamDialog = true },
-                containerColor = Purple80
+                containerColor = GoldYellow,
+                contentColor = DarkBlue,
+                shape = CircleShape
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Team")
             }
         }
     ) { paddingValues ->
-        // Keep your exact Column layout
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .background(Color.White)
         ) {
-            Text(
-                text = "Your Hockey Teams",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            // Header Section with Gradient
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(DarkBlue, BlueAccent)
+                        )
+                    )
+                    .padding(16.dp)
+            ) {
+                Column {
+                    Text(
+                        text = "Your Hockey Teams",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Manage teams and players",
+                        fontSize = 16.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
+            }
 
+            // Teams List Section
             if (teams.isEmpty()) {
-                Text(
-                    text = "No teams yet. Click the + button to add a team.",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = null,
+                            modifier = Modifier.size(72.dp),
+                            tint = LighterBlue.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No teams yet. Click the + button to add a team.",
+                            textAlign = TextAlign.Center,
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(teams) { team ->
-                        TeamCard(
+                        EnhancedTeamCard(
                             team = team,
                             onClick = {
                                 selectedTeam = team
@@ -114,9 +166,8 @@ fun TeamScreen(navController: NavController) {
             }
         }
 
-        // Keep your dialogs but update their actions to use ViewModel
         if (showAddTeamDialog) {
-            AddTeamDialog(
+            EnhancedAddTeamDialog(
                 onDismiss = { showAddTeamDialog = false },
                 onSave = { teamName, ageGroup, category ->
                     teamViewModel.registerTeam(
@@ -136,7 +187,7 @@ fun TeamScreen(navController: NavController) {
         }
 
         if (showTeamDialog && selectedTeam != null) {
-            TeamActionsDialog(
+            EnhancedTeamActionsDialog(
                 team = selectedTeam!!,
                 onDismiss = {
                     showTeamDialog = false
@@ -159,13 +210,15 @@ fun TeamScreen(navController: NavController) {
         }
     }
 }
+
 @Composable
-fun TeamCard(team: Team, onClick: () -> Unit) {
+fun EnhancedTeamCard(team: Team, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
@@ -177,15 +230,17 @@ fun TeamCard(team: Team, onClick: () -> Unit) {
             // Team Icon with hockey theme
             Box(
                 modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1E88E5)),
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(BlueAccent.copy(alpha = 0.2f))
+                    .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Home,
                     contentDescription = null,
-                    tint = Color.White
+                    tint = BlueAccent,
+                    modifier = Modifier.size(32.dp)
                 )
             }
 
@@ -198,70 +253,183 @@ fun TeamCard(team: Team, onClick: () -> Unit) {
                 Text(
                     text = team.name,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp,
+                    color = DarkBlue
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${team.ageGroup} • ${team.category}",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "${team.players.size} players",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Age Group",
+                        tint = BlueAccent,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = team.ageGroup,
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Category",
+                        tint = BlueAccent,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = team.category,
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Players",
+                        tint = BlueAccent,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${team.players.size} players",
+                        color = BlueAccent,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
+
+            // Arrow icon
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "View details",
+                tint = GoldYellow
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTeamDialog(
+fun EnhancedAddTeamDialog(
     onDismiss: () -> Unit,
     onSave: (String, String, String) -> Unit
 ) {
-    val teamViewModel: TeamViewModel = viewModel() // Get the ViewModel instance
-    val context = LocalContext.current // Get context in Compose
+    val teamViewModel: TeamViewModel = viewModel()
+    val context = LocalContext.current
 
     var teamName by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var ageGroup by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
 
-
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add New Team") },
+        containerColor = Color.White,
+        title = {
+            Text(
+                "Add New Team",
+                fontWeight = FontWeight.Bold,
+                color = DarkBlue
+            )
+        },
         text = {
-            Column {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 OutlinedTextField(
                     value = teamName,
                     onValueChange = { teamName = it },
                     label = { Text("Team Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Team",
+                            tint = BlueAccent
+                        )
+                    }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = ageGroup,
                     onValueChange = { ageGroup = it },
                     label = { Text("Age Group (e.g., U12, U14, U16)") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Age Group",
+                            tint = BlueAccent
+                        )
+                    }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = category,
                     onValueChange = { category = it },
                     label = { Text("Category (Indoor/Outdoor/Mixed)") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Category",
+                            tint = BlueAccent
+                        )
+                    }
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = gender,
                     onValueChange = { gender = it },
-                    label = { Text("Gender (Fenale/Male") },
-                    modifier = Modifier.fillMaxWidth()
+                    label = { Text("Gender (Female/Male)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Gender",
+                            tint = BlueAccent
+                        )
+                    }
                 )
             }
         },
@@ -269,13 +437,12 @@ fun AddTeamDialog(
             Button(
                 onClick = {
                     if (teamName.isNotBlank() && ageGroup.isNotBlank() && category.isNotBlank()) {
-                        teamViewModel.registerTeam(  // Call on the instance, not the class
+                        teamViewModel.registerTeam(
                             name = teamName,
                             ageGroup = ageGroup,
                             gender = gender,
                             category = category,
                             onSuccess = {
-                                // Show success message or navigate
                                 Toast.makeText(
                                     context,
                                     "Team registered successfully!",
@@ -285,10 +452,10 @@ fun AddTeamDialog(
                                     teamName,
                                     ageGroup,
                                     category
-                                ) // Call this after successful registration
+                                )
+                                onDismiss()
                             },
                             onFailure = { e ->
-                                // Show error message
                                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
                                     .show()
                             }
@@ -296,14 +463,27 @@ fun AddTeamDialog(
                     } else {
                         Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
                     }
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BlueAccent
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save")
+                Text("Save Team")
             }
         },
         dismissButton = {
-            Button(
-                onClick = onDismiss
+            OutlinedButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = BlueAccent
+                ),
+                border = ButtonDefaults.outlinedButtonBorder.copy(
+                    /*brush = /*SolidColor*/(BlueAccent)*/
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Cancel")
             }
@@ -313,7 +493,7 @@ fun AddTeamDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeamActionsDialog(
+fun EnhancedTeamActionsDialog(
     team: Team,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
@@ -322,50 +502,155 @@ fun TeamActionsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(team.name) },
+        containerColor = Color.White,
+        title = {
+            Text(
+                team.name,
+                fontWeight = FontWeight.Bold,
+                color = DarkBlue,
+                fontSize = 20.sp
+            )
+        },
         text = {
-            Column {
-                Text("Age Group: ${team.ageGroup}")
-                Text("Category: ${team.category}")
-                Text("Players: ${team.players.size}")
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = LighterBlue.copy(alpha = 0.1f)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Age Group",
+                                tint = BlueAccent,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Age Group: ${team.ageGroup}",
+                                fontSize = 16.sp,
+                                color = DarkBlue
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Category",
+                                tint = BlueAccent,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Category: ${team.category}",
+                                fontSize = 16.sp,
+                                color = DarkBlue
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Players",
+                                tint = BlueAccent,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Players: ${team.players.size}",
+                                fontSize = 16.sp,
+                                color = DarkBlue
+                            )
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
-            // Buttons go here
             Column(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = onViewPlayers,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(Icons.Default.Person, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("View Players")
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Button(
                     onClick = onEdit,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GoldYellow,
+                        contentColor = DarkBlue
+                    ),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Edit Team")
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Button(
                     onClick = onDelete,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFE53935)
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Delete Team")
                 }
-            }
-        },
-        modifier = Modifier, // Add your modifier here or remove if not needed
-        // properties = DialogProperties() // Uncomment if you need custom properties
-    )
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedButton(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = BlueAccent
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        /*brush = /*SolidColor*/(BlueAccent)*/
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Cancel")
+                }
+            }
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -394,54 +679,161 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(team?.name ?: "Team Players") },
+                title = {
+                    Text(
+                        team?.name ?: "Team Players",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = DarkBlue,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
         }
     ) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding)) {
-            items(players) { player ->
-                PlayerItem(player = player)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(Color.White)
+        ) {
+            // Header section with gradient
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(DarkBlue, BlueAccent)
+                        )
+                    )
+                    .padding(16.dp)
+            ) {
+                Column {
+                    Text(
+                        text = "Team Players",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "${players.size} members in this team",
+                        fontSize = 16.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
+            }
+
+            if (players.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(72.dp),
+                            tint = LighterBlue.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No players in this team yet",
+                            textAlign = TextAlign.Center,
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(players) { player ->
+                        EnhancedPlayerItem(player = player)
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun  PlayerItem(player: User) {
-    Card(modifier = Modifier.padding(8.dp)) {
+fun EnhancedPlayerItem(player: User) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(12.dp)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp)
-            )
+            // Player Avatar
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .background(LighterBlue.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = BlueAccent,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Column {
-                Text(text = player.firstName, fontWeight = FontWeight.Bold)
-                Text(text = player.email)
+                Text(
+                    text = player.firstName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = DarkBlue
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = player.email,
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
             }
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTeamScreen(navController: NavController, teamId: String) {
     val db = FirebaseFirestore.getInstance()
     var team by remember { mutableStateOf<Team?>(null) }
-
     var teamName by remember { mutableStateOf("") }
     var ageGroup by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     LaunchedEffect(teamId) {
         val teamSnapshot = db.collection("teams").document(teamId).get().await()
@@ -456,49 +848,161 @@ fun EditTeamScreen(navController: NavController, teamId: String) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Team") },
+                title = {
+                    Text(
+                        "Edit Team",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                actions = {
-                    IconButton(onClick = {
-                        team?.let { currentTeam ->
-                            val updatedTeam = currentTeam.copy(
-                                name = teamName,
-                                ageGroup = ageGroup,
-                                category = category
-                            )
-                            db.collection("teams").document(teamId).set(updatedTeam)
-                            navController.navigateUp()
-                        }
-                    }) {
-                        Icon(Icons.Default.Done, contentDescription = "Save")
-                    }
-                }
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = DarkBlue,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    team?.let { currentTeam ->
+                        if (teamName.isBlank() || ageGroup.isBlank() || category.isBlank()) {
+                            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                            return@FloatingActionButton
+                        }
+
+                        val updatedTeam = currentTeam.copy(
+                            name = teamName,
+                            ageGroup = ageGroup,
+                            category = category
+                        )
+                        db.collection("teams").document(teamId).set(updatedTeam)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Team updated successfully", Toast.LENGTH_SHORT).show()
+                                navController.navigateUp()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                },
+                containerColor = GoldYellow,
+                contentColor = DarkBlue
+            ) {
+                Icon(Icons.Default.Done, contentDescription = "Save")
+            }
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            OutlinedTextField(
-                value = teamName,
-                onValueChange = { teamName = it },
-                label = { Text("Team Name") },
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            )
-            OutlinedTextField(
-                value = ageGroup,
-                onValueChange = { ageGroup = it },
-                label = { Text("Age Group") },
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            )
-            OutlinedTextField(
-                value = category,
-                onValueChange = { category = it },
-                label = { Text("Category") },
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(Color.White)
+        ) {
+            // Header section with gradient
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(DarkBlue, BlueAccent)
+                        )
+                    )
+                    .padding(16.dp)
+            ) {
+                Column {
+                    Text(
+                        text = "Edit Team Details",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Update your team information",
+                        fontSize = 16.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
+            }
+
+            // Form section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = teamName,
+                    onValueChange = { teamName = it },
+                    label = { Text("Team Name") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Team",
+                            tint = BlueAccent
+                        )
+                    }
+                )
+
+                OutlinedTextField(
+                    value = ageGroup,
+                    onValueChange = { ageGroup = it },
+                    label = { Text("Age Group (e.g., U12, U14, U16)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Age Group",
+                            tint = BlueAccent
+                        )
+                    }
+                )
+
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Category (Indoor/Outdoor/Mixed)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = BlueAccent,
+                        focusedLabelColor = BlueAccent,
+                        cursorColor = BlueAccent
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Category",
+                            tint = BlueAccent
+                        )
+                    }
+                )
+            }
         }
     }
 }
