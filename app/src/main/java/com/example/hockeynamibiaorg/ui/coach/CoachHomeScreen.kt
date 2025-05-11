@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -15,6 +16,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,149 +34,428 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
+// Reusing the same color palette from player screen
+val DarkBlue = Color(0xFF142143)
+val GoldYellow = Color(0xFFFFAF00)
+val LightGray = Color(0xFFE4E4E4)
+val BlueAccent = Color(0xFF1A5D94)
+val LighterBlue = Color(0xFF2A6DA4)
+
+data class NewsItem(val title: String, val description: String, val url: String)
+data class MatchItem(val teams: String, val dateTime: String, val venue: String)
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachHomeScreen(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController, currentRoute = currentRoute) }
+        bottomBar = { CoachBottomNavigationBar(navController, currentRoute = currentRoute) }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            item { HeaderSection(navController) }
-            item { NewsUpdatesSection() }
-            item { UpcomingMatchSection() }
+            item { CoachHeaderSection(navController) }
+            item { CoachNewsUpdatesSection() }
+            item { CoachUpcomingMatchSection() }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeaderSection(navController: NavHostController) {  // Add navController parameter
+fun CoachHeaderSection(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
-    val userViewModel : UserViewModel = viewModel()
+    val userViewModel: UserViewModel = viewModel()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Confirm Logout") },
+            text = { Text("Are you sure you want to logout?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        userViewModel.logout()
+                        navController.navigate("logout") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                ) {
+                    Text("Yes, Logout", color = DarkBlue)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showLogoutDialog = false }
+                ) {
+                    Text("Cancel", color = DarkBlue)
+                }
+            }
+        )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(DarkBlue, BlueAccent)
+                )
+            )) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { showLogoutDialog = true },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.logout),
+                                contentDescription = "Logout",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Surface(
+                            modifier = Modifier.size(48.dp),
+                            shape = CircleShape,
+                            border = BorderStroke(1.dp, GoldYellow),
+                            color = Color.Transparent
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.profileimage),
+                                contentDescription = "Profile image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable { navController.navigate("coach_profile") }
+                            )
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Welcome Back, Coach!",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "Coach Name",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                "Search teams, players, or news...",
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "Search icon",
+                                tint = Color.White
+                            )
+                        },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                            focusedBorderColor = GoldYellow,
+                            cursorColor = GoldYellow
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+            }
+}
+
+@Composable
+fun CoachNewsUpdatesSection() {
+    val newsItems = listOf(
+        NewsItem(
+            "Team Selection Announcement",
+            "Final team selection for the upcoming tournament will be announced next week.",
+            "https://hockeynamibia.org/news/team-selection"
+        ),
+        NewsItem(
+            "Training Schedule Update",
+            "New training schedule effective from Monday. All players must attend.",
+            "https://hockeynamibia.org/news/training-schedule"
+        ),
+        NewsItem(
+            "Coaching Workshop",
+            "Register for the advanced coaching workshop on 15th June 2025.",
+            "https://hockeynamibia.org/news/coaching-workshop"
+        )
+    )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF033580))
+            .padding(horizontal = 16.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Logout Button
-            IconButton(
-                onClick = {
-                    // Handle logout logic here
-                    userViewModel.logout()
-                    navController.navigate("logout") {  // Replace "login" with your actual login route
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
-                },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Logout",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp))
-            }
+            Text(
+                text = "News & Updates",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = DarkBlue
+            )
+            Text(
+                text = "View All",
+                color = BlueAccent,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                modifier = Modifier.clickable { /* Handle view all */ }
+            )
+        }
 
-            // Profile Image
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = CircleShape,
-                border = BorderStroke(1.dp, Color.LightGray)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            newsItems.forEach { news ->
+                CoachNewsCard(news)
+            }
+        }
+    }
+}
+
+@Composable
+fun CoachNewsCard(news: NewsItem) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { /* Handle click */ },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.profileimage),
-                    contentDescription = "Profile image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(GoldYellow.copy(alpha = 0.2f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "News",
+                        tint = GoldYellow,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = news.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = DarkBlue,
+                    modifier = Modifier.weight(1f)
                 )
             }
+
+            Text(
+                text = news.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.DarkGray,
+                modifier = Modifier.padding(vertical = 12.dp)
+            )
+
+            Text(
+                text = "Read More",
+                color = BlueAccent,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun CoachUpcomingMatchSection() {
+    val matches = listOf(
+        MatchItem(
+            "Bank Windhoek Premier League: Your Team vs Coastal Hockey Club",
+            "17/05/2025, 14:30",
+            "Windhoek High School Hockey Fields"
+        ),
+        MatchItem(
+            "Friendly Match: Your Team vs UNAM",
+            "20/05/2025, 16:00",
+            "UNAM Sports Field, Windhoek"
+        ),
+        MatchItem(
+            "League Match: Your Team vs Wanderers",
+            "27/05/2025, 15:00",
+            "DTS Hockey Club, Olympia"
+        )
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Upcoming Matches",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = DarkBlue
+            )
+            Text(
+                text = "View All",
+                color = BlueAccent,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                modifier = Modifier.clickable { /* Handle view all */ }
+            )
         }
 
-        TextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("Search teams, players, or news...") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = "Search icon")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            matches.forEach { match ->
+                CoachMatchCard(match)
             }
-        )
+        }
     }
 }
 
 @Composable
-fun NewsUpdatesSection() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "News & Updates",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        NewsCard(
-            title = "League Fixtures",
-            description = "Release of updated league fixtures. Dated 19 April 2025",
-            actionText = "Read More"
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        NewsCard(
-            title = "New Coach for NUST",
-            description = "The NUST hockey club has appointed a new coach for the upcoming season.",
-            actionText = "Read More"
-        )
-    }
-}
-
-@Composable
-fun NewsCard(title: String, description: String, actionText: String) {
+fun CoachMatchCard(match: MatchItem) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { },
+            .clickable { /* Handle click */ },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(LighterBlue.copy(alpha = 0.2f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Match",
+                        tint = LighterBlue,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = match.teams,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = DarkBlue,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Date",
+                    tint = BlueAccent,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = match.dateTime,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Location",
+                    tint = BlueAccent,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = match.venue,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            Text(
-                text = actionText,
-                color = Color(0xFF1E88E5),
+                text = "Match Details",
+                color = BlueAccent,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
@@ -182,68 +464,7 @@ fun NewsCard(title: String, description: String, actionText: String) {
 }
 
 @Composable
-fun UpcomingMatchSection() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Upcoming Matches",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        MatchCard(
-            teams = "Windhoek Team vs Walvis Lions",
-            dateTime = "31/05/2025, 20:00 GMT",
-            venue = "Hage Geingob Stadium, Windhoek"
-        )
-    }
-}
-
-@Composable
-fun MatchCard(teams: String, dateTime: String, venue: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = teams,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = dateTime,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-            Text(
-                text = venue,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = "More Details",
-                color = Color(0xFF1E88E5),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(navController: NavHostController, currentRoute: String?) {
+fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: String?) {
     BottomAppBar(
         containerColor = Color(0xFF033580),
         contentColor = Color.Black
@@ -255,7 +476,7 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "Home",
-                modifier = Modifier.clickable { navController.navigate("coach_home")},
+                modifier = Modifier.clickable { navController.navigate("coach_home") },
                 tint = Color.White
             )
             Icon(
@@ -270,7 +491,6 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
                 modifier = Modifier.clickable { navController.navigate("teams") },
                 tint = Color.White
             )
-
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile",
@@ -287,3 +507,11 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun CoachHomeScreenPreview() {
+    val navController = rememberNavController()
+    MaterialTheme {
+        CoachHomeScreen(navController = navController)
+    }
+}

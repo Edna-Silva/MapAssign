@@ -26,11 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
+import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 // Reusing the same color palette from previous screens
 val DarkBlue = Color(0xFF142143)
 val GoldYellow = Color(0xFFFFAF00)
@@ -61,8 +63,41 @@ fun PlayerHomeScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun HeaderSection(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
+    val userViewModel:UserViewModel=viewModel()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Confirm Logout") },
+            text = { Text("Are you sure you want to logout?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        userViewModel.logout()
+                        navController.navigate("logout") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                ) {
+                    Text("Yes, Logout", color = DarkBlue)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showLogoutDialog = false }
+                ) {
+                    Text("Cancel", color = DarkBlue)
+                }
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -71,80 +106,90 @@ fun HeaderSection(navController: NavController) {
                 brush = Brush.verticalGradient(
                     colors = listOf(DarkBlue, BlueAccent)
                 )
-            )
-    ) {
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { /* Handle menu click */ },
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu",
-                        tint = Color.White
-                    )
-                }
-
-                Surface(
-                    modifier = Modifier.size(48.dp),
-                    shape = CircleShape,
-                    border = BorderStroke(1.dp, GoldYellow),
-                    color = Color.Transparent
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profileimage),
-                        contentDescription = "Profile image",
-                        contentScale = ContentScale.Crop,
+            ) ){
+                Column() {
+                    Row(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { navController.navigate("player_profile") }
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { showLogoutDialog = true }, // Show dialog on click
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.logout),
+                                contentDescription = "Logout",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Surface(
+                            modifier = Modifier.size(48.dp),
+                            shape = CircleShape,
+                            border = BorderStroke(1.dp, GoldYellow),
+                            color = Color.Transparent
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.profileimage),
+                                contentDescription = "Profile image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable { navController.navigate("player_profile") }
+                            )
+                        }
+                    }
+
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Welcome Back,",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "Player Name",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                "Search teams, players, or news...",
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "Search icon",
+                                tint = Color.White
+                            )
+                        },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                            focusedBorderColor = GoldYellow,
+                            cursorColor = GoldYellow,
+
+                            ),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
             }
-
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Welcome Back,",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = "Player Name",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Search teams, players, or news...", color = Color.White.copy(alpha = 0.7f)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = "Search icon", tint = Color.White)
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                    focusedBorderColor = GoldYellow,
-                    cursorColor = GoldYellow,
-
-                    ),
-                shape = RoundedCornerShape(12.dp)
-            )
-        }
-    }
 }
 
 @Composable
