@@ -7,5 +7,5 @@ data class Event(
     val description: String = "",
     val date: String = "",
     val time: String = "",
-    val type: String = "" // "Training" or "Match"
+    val type: String = "" // "Tournament", "Camp", or "League"
 )

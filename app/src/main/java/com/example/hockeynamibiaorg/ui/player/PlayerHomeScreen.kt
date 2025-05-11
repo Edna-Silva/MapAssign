@@ -31,9 +31,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
-
 // Reusing the same color palette from previous screens
-
+val DarkBlue = Color(0xFF142143)
+val GoldYellow = Color(0xFFFFAF00)
+val LightGray = Color(0xFFE4E4E4)
+val BlueAccent = Color(0xFF1A5D94)
+val LighterBlue = Color(0xFF2A6DA4)
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
