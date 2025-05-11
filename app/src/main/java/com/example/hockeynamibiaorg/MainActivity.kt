@@ -19,10 +19,9 @@ import com.example.hockeynamibiaorg.ui.auth.ForgotPasswordScreen
 import com.example.hockeynamibiaorg.ui.theme.HockeyNamibiaOrgTheme
 
 import com.example.hockeynamibiaorg.ui.common.WelcomeScreen
-
 import com.example.hockeynamibiaorg.ui.auth.LoginScreen
 import com.example.hockeynamibiaorg.ui.auth.RegisterScreen
-//import com.example.hockeynamibiaorg.ui.auth.samplePlayer
+import com.example.hockeynamibiaorg.ui.player.samplePlayer
 import com.example.hockeynamibiaorg.ui.coach.EditTeamScreen
 import com.example.hockeynamibiaorg.ui.coach.EventManagementScreen
 import com.example.hockeynamibiaorg.ui.coach.PlayerManagementScreen
@@ -34,6 +33,7 @@ import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
 
 
 import com.example.hockeynamibiaorg.ui.coach.*
+import com.example.hockeynamibiaorg.ui.player.PlayerProfile
 import com.google.firebase.FirebaseApp
 
 
@@ -112,6 +112,10 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
         composable(Navigation.PlayerManagement.route) {
             PlayerManagementScreen(navController)
         }
+        composable(Navigation.PlayerProfile.route) {
+            PlayerProfile(samplePlayer)
+        }
+
 
         // Dynamic Routes
         composable("teamPlayers/{teamId}") { backStackEntry ->
@@ -126,5 +130,6 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
                 backStackEntry.arguments?.getString("teamId") ?: ""
             )
         }
+
     }
 }

@@ -49,6 +49,23 @@ data class PlayerStats(
     val penaltyMinutes: Int
 )
 
+val samplePlayer = HockeyPlayer(
+    name = "Connor McDavid",
+    number = 97,
+    position = "Center",
+    team = "Edmonton Oilers",
+    age = 26,
+    height = "6'1\"",
+    weight = "193 lbs",
+    stats = PlayerStats(
+        goals = 44,
+        assists = 79,
+        points = 123,
+        plusMinus = 28,
+        penaltyMinutes = 36
+    ),
+    imageRes = R.drawable.profileimage
+)
 @Composable
 fun PlayerProfile(player: HockeyPlayer, onPlayerUpdate: (HockeyPlayer) -> Unit = {}) {
     var showEditDialog by remember { mutableStateOf(false) }

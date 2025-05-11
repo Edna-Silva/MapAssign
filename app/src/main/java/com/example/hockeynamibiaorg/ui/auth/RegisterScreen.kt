@@ -20,6 +20,7 @@ import com.example.hockeynamibiaorg.ui.common.PrimaryButton
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 import com.example.hockeynamibiaorg.ui.viewmodels.RegistrationViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
 
@@ -30,6 +31,7 @@ fun RegisterScreen(
     userViewModel: UserViewModel = viewModel(),
     registrationViewModel: RegistrationViewModel = viewModel()
 ) {
+
     // Form states
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -195,7 +197,7 @@ fun RegisterScreen(
                     registrationViewModel.updateErrorMessage("Please enter your email")
                 }
                 !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                  registrationViewModel.updateErrorMessage("Please enter a valid email address")
+                    registrationViewModel.updateErrorMessage("Please enter a valid email address")
                 }
                 password.isBlank() -> {
                     registrationViewModel.updateErrorMessage("Please enter a password")
