@@ -32,11 +32,7 @@ import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-// Define color palette to match PlayerHomeScreen
-val DarkBlue = Color(0xFF0D3B66)
-val BlueAccent = Color(0xFF2A6EBB)
-val LighterBlue = Color(0xFF4A90E2)
-val GoldYellow = Color(0xFFFFD166)
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -480,13 +476,13 @@ fun EnhancedAddTeamDialog(
                     contentColor = BlueAccent
                 ),
                 border = ButtonDefaults.outlinedButtonBorder.copy(
-                    /*brush = /*SolidColor*/(BlueAccent)*/
-                ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                   //brush =SolidColor/(BlueAccent)
+            ),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Cancel")
-            }
+            Text("Cancel")
+        }
         }
     )
 }
@@ -641,13 +637,13 @@ fun EnhancedTeamActionsDialog(
                         contentColor = BlueAccent
                     ),
                     border = ButtonDefaults.outlinedButtonBorder.copy(
-                        /*brush = /*SolidColor*/(BlueAccent)*/
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                        //brush = /*SolidColor/(BlueAccent)*/
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel")
-                }
+                Text("Cancel")
+            }
             }
         }
     )

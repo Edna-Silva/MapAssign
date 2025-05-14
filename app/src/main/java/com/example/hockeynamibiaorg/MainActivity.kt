@@ -121,10 +121,10 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
             )
         }
         composable("editTeam/{teamId}") { backStackEntry ->
-            EditTeamScreen(
-                navController,
+           EditTeamScreen(
+               navController,
                 backStackEntry.arguments?.getString("teamId") ?: ""
             )
-        }
+            }
     }
 }

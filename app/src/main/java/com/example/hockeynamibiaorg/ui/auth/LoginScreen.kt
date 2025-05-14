@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,12 @@ import com.example.hockeynamibiaorg.ui.common.AppTextField
 import com.example.hockeynamibiaorg.ui.common.Navigation
 import com.example.hockeynamibiaorg.ui.common.PrimaryButton
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
+
+// Define the colors from the palette
+val navyBlue = Color(0xFF142143)
+val gold = Color(0xFFffaf00)
+val lightGray = Color(0xFFe4e4e4)
+val blue = Color(0xFF1a5d94)
 
 @Composable
 fun LoginScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
@@ -108,17 +115,21 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel = vie
             label = "Email Address",
             value = email,
             onValueChange = { email = it },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = navyBlue.copy(alpha = 0.3f),
+            textColor = lightGray
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         AppTextField(
             label = "Password",
+            isPassword = true,
             value = password,
             onValueChange = { password = it },
-            isPassword = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = navyBlue.copy(alpha = 0.3f),
+            textColor = lightGray
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -227,7 +238,9 @@ fun ForgotPasswordScreen(navController: NavController, userViewModel: UserViewMo
             label = "Email Address",
             value = email,
             onValueChange = { email = it },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = navyBlue.copy(alpha = 0.3f),
+            textColor = lightGray
         )
 
         Spacer(modifier = Modifier.height(24.dp))

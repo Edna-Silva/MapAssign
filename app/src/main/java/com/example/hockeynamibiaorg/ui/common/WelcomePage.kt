@@ -17,10 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -41,6 +43,58 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.R
 import kotlinx.coroutines.delay
+
+@Composable
+fun PrimaryButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val buttonGradient = Brush.horizontalGradient(
+        colors = listOf(Color(0xFF142143), Color(0xFF1a5d94))
+    )
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(buttonGradient),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val buttonGradient = Brush.horizontalGradient(
+        colors = listOf(Color(0xFF243665), Color(0xFF2A7DBD))
+    )
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(buttonGradient),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
 
 @Composable
 fun WelcomeScreen(navController: NavController) {
@@ -61,14 +115,35 @@ fun WelcomeScreen(navController: NavController) {
         showButtons = true
     }
 
-    // Main background with a subtle gradient overlay
+    // Define the colors from the palette
+    val navyBlue = Color(0xFF142143)
+    val gold = Color(0xFFffaf00)
+    val lightGray = Color(0xFFe4e4e4)
+    val blue = Color(0xFF1a5d94)
+
+    // Lighter versions of the colors for the logo background
+    val lighterNavyBlue = Color(0xFF243665) // Lighter version of navyBlue
+    val lighterBlue = Color(0xFF2A7DBD) // Lighter version of blue
+
+    // Very light blue gradient colors for the logo background
+    val veryLightBlue1 = Color(0xFFD1E3F7)
+    val veryLightBlue2 = Color(0xFFE6F0FB)
+
+    // Create gradients with the palette colors
+    val gradientBrush = Brush.verticalGradient(
+        colors = listOf(navyBlue, blue)
+    )
+
+    val veryLightBlueGradient = Brush.verticalGradient(
+        colors = listOf(veryLightBlue1, veryLightBlue2)
+    )
+
+    // Main background with a gradient overlay
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(brush = gradientBrush)
     ) {
-        // Optional: Add a subtle pattern or gradient overlay here
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -92,9 +167,14 @@ fun WelcomeScreen(navController: NavController) {
                         .size(220.dp)
                         .clip(RoundedCornerShape(16.dp)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = veryLightBlueGradient)
+                    ) {
                         Image(
                             painter = painterResource(id = R.drawable.hockey),
                             contentDescription = "Hockey Namibia Logo",
@@ -120,7 +200,7 @@ fun WelcomeScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary
+                    color = lightGray
                 )
             }
 
@@ -135,7 +215,7 @@ fun WelcomeScreen(navController: NavController) {
                     text = "The premier app for the best hockey organization in Namibia",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                    color = lightGray.copy(alpha = 0.9f),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
@@ -146,7 +226,6 @@ fun WelcomeScreen(navController: NavController) {
             AnimatedVisibility(
                 visible = showButtons,
                 enter = fadeIn() + slideInVertically(initialOffsetY = { 60 }),
-
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
