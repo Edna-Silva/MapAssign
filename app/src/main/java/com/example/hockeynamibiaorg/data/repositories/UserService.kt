@@ -2,6 +2,8 @@ package com.example.hockeynamibiaorg.data.repositories
 
 
 import android.util.Log
+import com.example.hockeynamibiaorg.data.models.Coach
+import com.example.hockeynamibiaorg.data.models.Player
 import com.example.hockeynamibiaorg.data.models.User
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,9 +25,9 @@ class UserService {
         }
     }
 
-    suspend fun createPlayer(user: User): Boolean {
+    suspend fun createPlayer(player: Player): Boolean {
         return try {
-            playersCollection.document(user.id).set(user).await()
+            playersCollection.document(player.id).set(player).await()
             true
         } catch (e: Exception) {
             Log.e("UserService", "Create player failed: ${e.message}", e)
@@ -33,9 +35,9 @@ class UserService {
         }
     }
 
-    suspend fun createCoach(user: User): Boolean {
+    suspend fun createCoach(coach: Coach): Boolean {
         return try {
-            coachesCollection.document(user.id).set(user).await()
+            coachesCollection.document(coach.id).set(coach).await()
             true
         } catch (e: Exception) {
             Log.e("UserService", "Create coach failed: ${e.message}", e)
@@ -49,9 +51,38 @@ class UserService {
             if (!userCreated) return false
 
             when (user.role.lowercase()) {
-                "player" -> createPlayer(user)
-                "coach" -> createCoach(user)
-                else -> false
+                "player" -> {
+                    val player = Player(
+                        id = user.id,
+                        ageGroup = "", // You'll need to get this from UI or set default
+                        teamId = "", // You'll need to get this from UI or set default
+                        stats = "",
+                        goals = "",
+                        points = "",
+                        email = "",
+                        firstName= "",
+                        lastName = "",
+                        phoneNumber = "",
+                        profileImageUrl = "",
+
+                    )
+                    createPlayer(player)
+                }
+                "coach" -> {
+                    val coach = Coach(
+                        id = user.id,
+                        ageGroup = "", // You'll need to get this from UI or set default
+                        teamId = "", // You'll need to get this from UI or set default
+                        stats = "",
+                        email = "",
+                        firstName= "",
+                        lastName = "",
+                        phoneNumber = "",
+                        profileImageUrl = "",
+                    )
+                    createCoach(coach)
+                }
+                else -> true // For other roles, just create the user
             }
         } catch (e: Exception) {
             Log.e("UserService", "Registration failed: ${e.message}", e)

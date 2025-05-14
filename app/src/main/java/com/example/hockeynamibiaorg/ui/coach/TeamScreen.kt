@@ -97,7 +97,7 @@ fun TeamScreen(navController: NavController) {
                     .fillMaxWidth()
                     .background(
                         brush = Brush.verticalGradient(
-                            colors = listOf(DarkBlue, BlueAccent)
+                            colors = listOf(Color(0xFF142143), Color(0xFF3F5291))
                         )
                     )
                     .padding(16.dp)
@@ -659,18 +659,18 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
     val db = FirebaseFirestore.getInstance()
     var team by remember { mutableStateOf<Team?>(null) }
     var players by remember { mutableStateOf<List<User>>(emptyList()) }
+    var showAddPlayerDialog by remember { mutableStateOf(false) }
+    var selectedPlayer by remember { mutableStateOf<User?>(null) }
 
+    // Load team and players
     LaunchedEffect(teamId) {
-        // Fetch team
         val teamSnapshot = db.collection("teams").document(teamId).get().await()
         team = teamSnapshot.toObject(Team::class.java)
 
-        // Fetch players
         if (team?.players?.isNotEmpty() == true) {
-            val playersList = mutableListOf<User>()
-            for (playerId in team!!.players) {
-                val playerSnapshot = db.collection("users").document(playerId).get().await()
-                playerSnapshot.toObject(User::class.java)?.let { playersList.add(it) }
+            val playersList = team!!.players.mapNotNull { playerId ->
+                val snapshot = db.collection("users").document(playerId).get().await()
+                snapshot.toObject(User::class.java)
             }
             players = playersList
         }
@@ -679,12 +679,7 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        team?.name ?: "Team Players",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
+                title = { Text(team?.name ?: "Team Players", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -692,10 +687,18 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = DarkBlue,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    titleContentColor = Color.White
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddPlayerDialog = true },
+                containerColor = GoldYellow,
+                contentColor = DarkBlue
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Player")
+            }
         }
     ) { padding ->
         Column(
@@ -704,75 +707,72 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
                 .padding(padding)
                 .background(Color.White)
         ) {
-            // Header section with gradient
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(DarkBlue, BlueAccent)
-                        )
-                    )
-                    .padding(16.dp)
-            ) {
-                Column {
-                    Text(
-                        text = "Team Players",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "${players.size} members in this team",
-                        fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                }
-            }
-
             if (players.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(72.dp),
-                            tint = LighterBlue.copy(alpha = 0.5f)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No players in this team yet",
-                            textAlign = TextAlign.Center,
-                            color = Color.Gray,
-                            fontSize = 16.sp
-                        )
-                    }
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No players found. Tap + to add a player.")
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                LazyColumn(modifier = Modifier.padding(16.dp)) {
                     items(players) { player ->
-                        EnhancedPlayerItem(player = player)
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable { selectedPlayer = player },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = LighterBlue.copy(alpha = 0.1f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Person, contentDescription = null, tint = BlueAccent)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(player.firstName ?: "Unnamed Player", fontWeight = FontWeight.SemiBold)
+                            }
+                        }
                     }
                 }
             }
         }
+
+        if (showAddPlayerDialog) {
+            AddPlayerDialog(
+                onDismiss = { showAddPlayerDialog = false },
+                onAdd = { newPlayerId ->
+                    // Update team with new player ID
+                    val updatedPlayerList = team?.players?.toMutableList() ?: mutableListOf()
+                    updatedPlayerList.add(newPlayerId)
+                    db.collection("teams").document(teamId)
+                        .update("players", updatedPlayerList)
+                        .addOnSuccessListener {
+                            showAddPlayerDialog = false
+                        }
+                }
+            )
+        }
+
+        if (selectedPlayer != null) {
+            EditDeletePlayerDialog(
+                player = selectedPlayer!!,
+                onDismiss = { selectedPlayer = null },
+                onEdit = { /* Navigate to edit screen or implement edit logic */ },
+                onDelete = {
+                    // Remove player from team
+                    val updated = team?.players?.toMutableList()
+                    updated?.remove(selectedPlayer!!.id)
+                    db.collection("teams").document(teamId)
+                        .update("players", updated)
+                        .addOnSuccessListener {
+                            players = players.filter { it.id != selectedPlayer!!.id }
+                            selectedPlayer = null
+                        }
+                }
+            )
+        }
     }
 }
+
 
 @Composable
 fun EnhancedPlayerItem(player: User) {
@@ -1005,4 +1005,71 @@ fun EditTeamScreen(navController: NavController, teamId: String) {
             }
         }
     }
+}
+@Composable
+fun AddPlayerDialog(onDismiss: () -> Unit, onAdd: (String) -> Unit) {
+    var playerName by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Player") },
+        text = {
+            OutlinedTextField(
+                value = playerName,
+                onValueChange = { playerName = it },
+                label = { Text("Player Name") },
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            Button(onClick = {
+                val newPlayerId = FirebaseFirestore.getInstance().collection("users").document().id
+                val newUser = User(id = newPlayerId, firstName = playerName)
+                FirebaseFirestore.getInstance().collection("users").document(newPlayerId)
+                    .set(newUser)
+                    .addOnSuccessListener {
+                        onAdd(newPlayerId)
+                    }
+            }) {
+                Text("Add")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+@Composable
+fun EditDeletePlayerDialog(
+    player: User,
+    onDismiss: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(player.firstName ?: "Player") },
+        text = { Text("What would you like to do with this player?") },
+        confirmButton = {
+            Column {
+                Button(onClick = onEdit, modifier = Modifier.fillMaxWidth()) {
+                    Text("Edit Player")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onDelete,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Delete Player")
+                }
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                Text("Cancel")
+            }
+        }
+    )
 }

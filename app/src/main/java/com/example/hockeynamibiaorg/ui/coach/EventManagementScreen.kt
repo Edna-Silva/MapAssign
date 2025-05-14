@@ -47,8 +47,6 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun EventManagementScreen(navController: NavController, eventViewModel: EventViewModelNew = viewModel()) {
     // State variables
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedEvent by remember { mutableStateOf<Event?>(null) }
     var showAddEventDialog by remember { mutableStateOf(false) }
     var showEventDetails by remember { mutableStateOf(false) }
@@ -69,16 +67,6 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
             }
             matchesType && matchesSearch
         }
-    }
-
-    // Filter events for the current month
-    val monthEvents = filteredEvents.filter { event ->
-        val eventDate = try {
-            LocalDate.parse(event.date, DateTimeFormatter.ISO_DATE)
-        } catch (e: Exception) {
-            null
-        }
-        eventDate?.year == currentMonth.year && eventDate?.monthValue == currentMonth.monthValue
     }
 
     Scaffold(
@@ -171,7 +159,7 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
                 ) {
                     Column {
                         Text(
-                            text = "Event Calendar",
+                            text = "All Events",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 22.sp
@@ -187,165 +175,13 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Month/year display with navigation
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { currentMonth = currentMonth.minusMonths(1) },
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Previous month",
-                            tint = Color(0xFF142143)
-                        )
-                    }
-
-                    Text(
-                        text = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
-                        color = Color(0xFF142143),
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    IconButton(
-                        onClick = { currentMonth = currentMonth.plusMonths(1) },
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Next month",
-                            modifier = Modifier.rotate(180f),
-                            tint = Color(0xFF142143)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Weekday headers
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    listOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN").forEach { day ->
-                        Text(
-                            text = day,
-                            modifier = Modifier.weight(1f),
-                            textAlign = TextAlign.Center,
-                            color = Color(0xFF142143).copy(alpha = 0.7f),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Calendar days grid
-                val daysInMonth = currentMonth.lengthOfMonth()
-                val firstDayOfMonth = currentMonth.atDay(1).dayOfWeek.value
-                val days = List(6 * 7) { index ->
-                    if (index >= firstDayOfMonth - 1 && index < firstDayOfMonth - 1 + daysInMonth) {
-                        index - firstDayOfMonth + 2
-                    } else {
-                        null
-                    }
-                }.chunked(7)
-
-                days.forEach { week ->
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        week.forEach { day ->
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(4.dp)
-                                    .aspectRatio(1f)
-                                    .clickable {
-                                        day?.let {
-                                            selectedDate = currentMonth.atDay(it)
-                                            val eventForDay = filteredEvents.find { event ->
-                                                try {
-                                                    LocalDate.parse(event.date, DateTimeFormatter.ISO_DATE) == selectedDate
-                                                } catch (e: Exception) {
-                                                    false
-                                                }
-                                            }
-                                            if (eventForDay != null) {
-                                                selectedEvent = eventForDay
-                                                showEventDetails = true
-                                            }
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                day?.let {
-                                    val date = currentMonth.atDay(it)
-                                    val hasEvent = filteredEvents.any { event ->
-                                        try {
-                                            LocalDate.parse(event.date, DateTimeFormatter.ISO_DATE) == date
-                                        } catch (e: Exception) {
-                                            false
-                                        }
-                                    }
-
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(
-                                            text = it.toString(),
-                                            color = when {
-                                                date == selectedDate -> Color.White
-                                                date == LocalDate.now() -> Color(0xFF1A5D94)
-                                                else -> Color(0xFF142143)
-                                            },
-                                            modifier = Modifier
-                                                .background(
-                                                    when {
-                                                        date == selectedDate -> Color(0xFF1A5D94)
-                                                        date == LocalDate.now() -> Color(0xFF1A5D94).copy(alpha = 0.1f)
-                                                        else -> Color.Transparent
-                                                    },
-                                                    RoundedCornerShape(50)
-                                                )
-                                                .size(32.dp)
-                                                .padding(8.dp),
-                                            textAlign = TextAlign.Center,
-                                            fontWeight = if (date == selectedDate) FontWeight.Bold else FontWeight.Normal
-                                        )
-                                        if (hasEvent) {
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(6.dp)
-                                                    .background(Color(0xFFFFAF00), RoundedCornerShape(50))
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Events for selected date
-                val dayEvents = filteredEvents.filter { event ->
-                    try {
-                        LocalDate.parse(event.date, DateTimeFormatter.ISO_DATE) == selectedDate
-                    } catch (e: Exception) {
-                        false
-                    }
-                }
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Events for ${selectedDate.format(DateTimeFormatter.ofPattern("MMM d"))}",
+                        text = "All Events (${filteredEvents.size})",
                         color = Color(0xFF142143),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -365,11 +201,11 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (dayEvents.isNotEmpty()) {
+                if (filteredEvents.isNotEmpty()) {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(dayEvents) { event ->
+                        items(filteredEvents.sortedBy { it.date }) { event ->
                             ModernEventCard(
                                 event = event,
                                 onCardClick = {
@@ -404,7 +240,7 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
                 eventViewModel.addEvent(newEvent)
                 showAddEventDialog = false
             },
-            initialDate = selectedDate
+            initialDate = LocalDate.now()
         )
     }
 
@@ -424,7 +260,6 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
         )
     }
 }
-
 @Composable
 fun ModernEventCard(
     event: Event,
@@ -603,7 +438,7 @@ fun ModernEventCard(
                         }
 
                         // Action buttons for management
-                        Row(
+                       /* Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
@@ -647,7 +482,7 @@ fun ModernEventCard(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text("Delete")
                             }
-                        }
+                        }*/
                     }
                 }
             }

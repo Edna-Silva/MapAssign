@@ -101,7 +101,7 @@ fun CoachHeaderSection(navController: NavController) {
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(DarkBlue, BlueAccent)
+                    colors = listOf(Color(0xFF142143), Color(0xFF3F5291))
                 )
             ) ){
                 Column {
