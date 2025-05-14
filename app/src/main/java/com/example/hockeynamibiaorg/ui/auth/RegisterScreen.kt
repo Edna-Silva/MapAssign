@@ -24,6 +24,7 @@ import com.example.hockeynamibiaorg.ui.common.PrimaryButton
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 import com.example.hockeynamibiaorg.ui.viewmodels.RegistrationViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,6 +34,7 @@ fun RegisterScreen(
     userViewModel: UserViewModel = viewModel(),
     registrationViewModel: RegistrationViewModel = viewModel()
 ) {
+<<<<<<< HEAD
     // Define the gradient colors
     val navyBlue = Color(0xFF142143)
     val blue = Color(0xFF1a5d94)
@@ -42,6 +44,8 @@ fun RegisterScreen(
     val buttonGradient = Brush.horizontalGradient(
         colors = listOf(navyBlue, blue)
     )
+=======
+>>>>>>> 1f8a4fce3c909fefd94a04f832c9377f5c132deb
 
     // Form states
     var firstName by remember { mutableStateOf("") }
@@ -323,5 +327,85 @@ fun RegisterScreen(
                 }
             )
         }
+<<<<<<< HEAD
+=======
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        AppTextField(
+            label = "Password",
+            value = password,
+            onValueChange = { password = it },
+            isPassword = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        AppTextField(
+            label = "Confirm Password",
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            isPassword = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        PrimaryButton(
+            text = if (isLoading) "Creating Account..." else "Register",
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            // Validate input
+            when {
+                firstName.isBlank() || lastName.isBlank() -> {
+                    registrationViewModel.updateErrorMessage("Please enter your full name")
+                }
+                email.isBlank() -> {
+                    registrationViewModel.updateErrorMessage("Please enter your email")
+                }
+                !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                    registrationViewModel.updateErrorMessage("Please enter a valid email address")
+                }
+                password.isBlank() -> {
+                    registrationViewModel.updateErrorMessage("Please enter a password")
+                }
+                password.length < 6 -> {
+                    registrationViewModel.updateErrorMessage("Password should be at least 6 characters")
+                }
+                password != confirmPassword -> {
+                    registrationViewModel.updateErrorMessage("Passwords do not match")
+                }
+                else -> {
+                    // Create user object
+                    val user = User(
+                        id = UUID.randomUUID().toString(),
+                        email = email,
+                        firstName = firstName,
+                        lastName = lastName,
+                        role = selectedRole.lowercase(),
+                        phoneNumber = phoneNumber
+                    )
+
+                    // Register user
+                    registrationViewModel.registerUser(user, password)
+
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        SecondaryButton(
+            text = "Already have an account? Login",
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                navController.navigate(Navigation.Login.route) {
+                    popUpTo(Navigation.Register.route) { inclusive = true }
+                }
+            }
+        )
+>>>>>>> 1f8a4fce3c909fefd94a04f832c9377f5c132deb
     }
 }

@@ -1,8 +1,9 @@
 package com.example.hockeynamibiaorg.data.repositories
 
-import android.content.ContentValues.TAG
+
 import android.util.Log
-import androidx.navigation.NavController
+import com.example.hockeynamibiaorg.data.models.Coach
+import com.example.hockeynamibiaorg.data.models.Player
 import com.example.hockeynamibiaorg.data.models.User
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -16,8 +17,7 @@ class UserService {
 
     suspend fun createUser(user: User): Boolean {
         return try {
-            // Add to People collection with email as document ID
-            usersCollection.document(user.email).set(user).await()
+            usersCollection.document(user.id).set(user).await()
             true
         } catch (e: Exception) {
             Log.e("UserService", "Create user failed: ${e.message}", e)
@@ -25,10 +25,9 @@ class UserService {
         }
     }
 
-    suspend fun createPlayer(user: User): Boolean {
+    suspend fun createPlayer(player: Player): Boolean {
         return try {
-            // Add to players collection with email as document ID
-            playersCollection.document(user.email).set(user).await()
+            playersCollection.document(player.id).set(player).await()
             true
         } catch (e: Exception) {
             Log.e("UserService", "Create player failed: ${e.message}", e)
@@ -36,10 +35,9 @@ class UserService {
         }
     }
 
-    suspend fun createCoach(user: User): Boolean {
+    suspend fun createCoach(coach: Coach): Boolean {
         return try {
-            // Add to coaches collection with email as document ID
-            coachesCollection.document(user.email).set(user).await()
+            coachesCollection.document(coach.id).set(coach).await()
             true
         } catch (e: Exception) {
             Log.e("UserService", "Create coach failed: ${e.message}", e)
@@ -49,15 +47,42 @@ class UserService {
 
     suspend fun registerUser(user: User): Boolean {
         return try {
-            // First create in People collection
             val userCreated = createUser(user)
             if (!userCreated) return false
 
-            // Then create in appropriate role collection
             when (user.role.lowercase()) {
-                "player" -> createPlayer(user)
-                "coach" -> createCoach(user)
-                else -> false
+                "player" -> {
+                    val player = Player(
+                        id = user.id,
+                        email = user.email,
+                        firstName= user.firstName,
+                        lastName = user.lastName,
+                        phoneNumber = user.phoneNumber,
+                        ageGroup = "",
+                        teamId = "",
+                        stats = "",
+                        goals = "",
+                        points = "",
+                        profileImageUrl = "",
+                        //coachId = "",
+                    )
+                    createPlayer(player)
+                }
+                "coach" -> {
+                    val coach = Coach(
+                        id = user.id,
+                        email = user.email,
+                        firstName= user.firstName,
+                        lastName = user.lastName,
+                        phoneNumber = user.phoneNumber,
+                        ageGroup = "",
+                        teamId = "",
+                        stats = "",
+                        profileImageUrl = "",
+                    )
+                    createCoach(coach)
+                }
+                else -> true // For other roles, just create the user
             }
         } catch (e: Exception) {
             Log.e("UserService", "Registration failed: ${e.message}", e)
@@ -65,11 +90,16 @@ class UserService {
         }
     }
 
+    // ✅ KEEP this to check for duplicates before registration
     suspend fun getUserByEmail(email: String): User? {
         return try {
-            val document = usersCollection.document(email).get().await()
-            if (document.exists()) {
-                document.toObject(User::class.java)
+            val querySnapshot = usersCollection
+                .whereEqualTo("email", email)
+                .get()
+                .await()
+
+            if (!querySnapshot.isEmpty) {
+                querySnapshot.documents[0].toObject(User::class.java)
             } else {
                 null
             }
@@ -78,6 +108,7 @@ class UserService {
             null
         }
     }
+
 
     suspend fun getUserById(userId: String): User? {
         return try {

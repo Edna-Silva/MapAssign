@@ -34,12 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
-// Reusing the same color palette from player screen
-val DarkBlue = Color(0xFF142143)
-val GoldYellow = Color(0xFFFFAF00)
-val LightGray = Color(0xFFE4E4E4)
-val BlueAccent = Color(0xFF1A5D94)
-val LighterBlue = Color(0xFF2A6DA4)
+
 
 data class NewsItem(val title: String, val description: String, val url: String)
 data class MatchItem(val teams: String, val dateTime: String, val venue: String)
@@ -106,9 +101,9 @@ fun CoachHeaderSection(navController: NavController) {
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(DarkBlue, BlueAccent)
+                    colors = listOf(Color(0xFF142143), Color(0xFF3F5291))
                 )
-            )) {
+            ) ){
                 Column {
                     Row(
                         modifier = Modifier
@@ -395,7 +390,7 @@ fun CoachMatchCard(match: MatchItem) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Home,
+                        imageVector = Icons.Default.Lock,
                         contentDescription = "Match",
                         tint = LighterBlue,
                         modifier = Modifier.size(20.dp)

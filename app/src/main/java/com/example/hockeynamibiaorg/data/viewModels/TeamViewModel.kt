@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.hockeynamibiaorg.data.models.Event
 import com.example.hockeynamibiaorg.data.models.Player
 import com.example.hockeynamibiaorg.data.models.Team
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,7 +60,8 @@ class TeamViewModel : ViewModel() {
                     name = name,
                     ageGroup = ageGroup,
                     gender = gender,
-                    category = category
+                    category = category,
+                    //coachId = auth.currentUser.toString(),
                 )
 
                 db.collection("teams")
