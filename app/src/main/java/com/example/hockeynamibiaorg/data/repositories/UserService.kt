@@ -54,30 +54,30 @@ class UserService {
                 "player" -> {
                     val player = Player(
                         id = user.id,
-                        ageGroup = "", // You'll need to get this from UI or set default
-                        teamId = "", // You'll need to get this from UI or set default
+                        email = user.email,
+                        firstName= user.firstName,
+                        lastName = user.lastName,
+                        phoneNumber = user.phoneNumber,
+                        ageGroup = "",
+                        teamId = "",
                         stats = "",
                         goals = "",
                         points = "",
-                        email = "",
-                        firstName= "",
-                        lastName = "",
-                        phoneNumber = "",
                         profileImageUrl = "",
-
+                        //coachId = "",
                     )
                     createPlayer(player)
                 }
                 "coach" -> {
                     val coach = Coach(
                         id = user.id,
-                        ageGroup = "", // You'll need to get this from UI or set default
-                        teamId = "", // You'll need to get this from UI or set default
+                        email = user.email,
+                        firstName= user.firstName,
+                        lastName = user.lastName,
+                        phoneNumber = user.phoneNumber,
+                        ageGroup = "",
+                        teamId = "",
                         stats = "",
-                        email = "",
-                        firstName= "",
-                        lastName = "",
-                        phoneNumber = "",
                         profileImageUrl = "",
                     )
                     createCoach(coach)

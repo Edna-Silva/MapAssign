@@ -1,6 +1,6 @@
 package com.example.hockeynamibiaorg.data.models
 
-class Coach (
+data class Coach (
         val id: String = "",
         val ageGroup: String = "",
         val teamId: String = "",
@@ -12,7 +12,7 @@ class Coach (
         val phoneNumber: String = "",
         val profileImageUrl: String = "",
         val dateJoined: Long = System.currentTimeMillis(),
-        val isActive: Boolean = true
+        val isActive: Boolean = true,
 
 
     )
