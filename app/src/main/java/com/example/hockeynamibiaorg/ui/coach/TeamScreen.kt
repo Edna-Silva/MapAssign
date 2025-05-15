@@ -33,7 +33,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.hockeynamibiaorg.data.models.Player
 
-
+val DarkBlue = Color(0xFF142143)
+val GoldYellow = Color(0xFFFFAF00)
+val LightGray = Color(0xFFE4E4E4)
+val BlueAccent = Color(0xFF1A5D94)
+val LighterBlue = Color(0xFF2A6DA4)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

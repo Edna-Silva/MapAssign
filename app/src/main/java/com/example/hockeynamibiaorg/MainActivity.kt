@@ -129,11 +129,7 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
                navController,
                 backStackEntry.arguments?.getString("teamId") ?: ""
             )
-<<<<<<< HEAD
             }
-=======
         }
 
->>>>>>> 1f8a4fce3c909fefd94a04f832c9377f5c132deb
     }
-}
