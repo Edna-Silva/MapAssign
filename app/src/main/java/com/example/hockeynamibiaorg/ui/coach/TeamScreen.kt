@@ -33,11 +33,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.hockeynamibiaorg.data.models.Player
 
-// Define color palette to match PlayerHomeScreen
-val DarkBlue = Color(0xFF0D3B66)
-val BlueAccent = Color(0xFF2A6EBB)
-val LighterBlue = Color(0xFF4A90E2)
-val GoldYellow = Color(0xFFFFD166)
+val DarkBlue = Color(0xFF142143)
+val GoldYellow = Color(0xFFFFAF00)
+val LightGray = Color(0xFFE4E4E4)
+val BlueAccent = Color(0xFF1A5D94)
+val LighterBlue = Color(0xFF2A6DA4)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -454,7 +454,7 @@ fun EnhancedAddTeamDialog(
                                     ageGroup,
                                     category,
 
-                                )
+                                    )
                                 onDismiss()
                             },
                             onFailure = { e ->
@@ -482,7 +482,7 @@ fun EnhancedAddTeamDialog(
                     contentColor = BlueAccent
                 ),
                 border = ButtonDefaults.outlinedButtonBorder.copy(
-                    /*brush = /*SolidColor*/(BlueAccent)*/
+                    //brush =SolidColor/(BlueAccent)
                 ),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -643,7 +643,7 @@ fun EnhancedTeamActionsDialog(
                         contentColor = BlueAccent
                     ),
                     border = ButtonDefaults.outlinedButtonBorder.copy(
-                        /*brush = /*SolidColor*/(BlueAccent)*/
+                        //brush = /*SolidColor/(BlueAccent)*/
                     ),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth()

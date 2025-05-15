@@ -1,6 +1,6 @@
 package com.example.hockeynamibiaorg.data.models
 data class Team(
-    val id: String = "",
+    var id: String = "",
     val name: String = "",
     val ageGroup: String = "",
     val category: String = "", // "Indoor", "Outdoor", or "Mixed"

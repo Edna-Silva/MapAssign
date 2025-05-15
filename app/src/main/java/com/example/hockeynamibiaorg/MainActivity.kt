@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.Button
 
 import androidx.compose.runtime.Composable
 
@@ -13,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.hockeynamibiaorg.data.repositories.AuthService
 import com.example.hockeynamibiaorg.data.repositories.SessionManager
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 import com.example.hockeynamibiaorg.ui.auth.ForgotPasswordScreen
@@ -34,6 +36,7 @@ import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
 
 import com.example.hockeynamibiaorg.ui.coach.*
 import com.example.hockeynamibiaorg.ui.player.PlayerProfile
+import com.example.hockeynamibiaorg.ui.player.PlayerTeamScreen
 import com.google.firebase.FirebaseApp
 
 
@@ -69,6 +72,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
     val navController = rememberNavController()
+    val auth : AuthService? = null
 
     NavHost(
         navController = navController,
@@ -97,6 +101,14 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
         }
         composable(Navigation.PlayerEvents.route) {
             EventEntriesScreen(navController)
+        }
+        val currentPlayerId = userViewModel.currentUser.value?.id ?: ""
+         composable(Navigation.PlayerTeam.route){
+             PlayerTeamScreen(navController,currentPlayerId)
+         }
+        composable("player_team/{playerId}") { backStackEntry ->
+            val playerId = backStackEntry.arguments?.getString("playerId") ?: ""
+            PlayerTeamScreen(navController, playerId)
         }
 
         // Coach Screens
