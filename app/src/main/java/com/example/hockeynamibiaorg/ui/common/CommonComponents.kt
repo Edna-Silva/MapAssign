@@ -73,7 +73,9 @@ fun AppTextField(
     isPassword: Boolean = false,
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerColor: Color,
+    textColor: Color
 ) {
     val text = remember { mutableStateOf("") }
 
