@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -497,7 +498,7 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Events") },
+            icon = { Icon(Icons.Default.DateRange, contentDescription = "Events") },
             label = { Text("Events") },
             selected = currentRoute == "player_events",
             onClick = { navController.navigate("player_events") },
@@ -511,7 +512,7 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
         )
 
         NavigationBarItem(
-            icon = { Icon(Icons.Default.DateRange, contentDescription = "Player Team") },
+            icon = { Icon(painter = painterResource(id = R.drawable.group), contentDescription = "Player Team",modifier= Modifier.size(30.dp))},
             label = { Text("Teams") },
             selected = currentRoute == "player_team",
             onClick = { navController.navigate("player_team") },

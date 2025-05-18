@@ -496,7 +496,7 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Events") },
+            icon = { Icon(Icons.Default.DateRange, contentDescription = "Events") },
             label = { Text("Events") },
             selected = currentRoute == "coach_events",
             onClick = { navController.navigate("coach_events") },
@@ -509,7 +509,7 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.DateRange, contentDescription = "Coach Team") },
+            icon = { Icon(painter = painterResource(id = R.drawable.group), contentDescription = "Coach Team",modifier= Modifier.size(30.dp)) },
             label = { Text("Teams") },
             selected = currentRoute == "teams",
             onClick = { navController.navigate("teams") },
