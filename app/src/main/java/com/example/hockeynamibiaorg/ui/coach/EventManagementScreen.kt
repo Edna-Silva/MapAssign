@@ -535,15 +535,16 @@ fun AddEventDialog(
                 ) {
                     OutlinedTextField(
                         value = type,
-                        onValueChange = { type = it },
+                        onValueChange = {}, // Disable manual typing
                         label = { Text("Event Type") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
                         readOnly = true,
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                         },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = Color(0xFF1A5D94),
                             unfocusedBorderColor = Color(0xFFE4E4E4),
