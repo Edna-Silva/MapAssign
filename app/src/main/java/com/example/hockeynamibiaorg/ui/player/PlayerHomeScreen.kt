@@ -32,6 +32,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
+import com.example.hockeynamibiaorg.data.viewModels.PlayerProfileViewModel
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 // Reusing the same color palette from previous screens
 val DarkBlue = Color(0xFF142143)
@@ -68,7 +69,17 @@ fun HeaderSection(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val userViewModel:UserViewModel=viewModel()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    val viewModel: PlayerProfileViewModel = viewModel()
 
+    // Replace this with your actual logic to get the coachId (e.g., from auth or session)
+    val playerId = userViewModel.currentUser.value?.id
+
+    // Load coach profile once on first composition
+    LaunchedEffect(Unit) {
+        if (playerId != null) {
+            viewModel.loadPlayerProfile(playerId)
+        }
+    }
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -144,6 +155,7 @@ fun HeaderSection(navController: NavController) {
                         }
                     }
 
+                    val player = viewModel.player
 
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -153,12 +165,14 @@ fun HeaderSection(navController: NavController) {
                             color = Color.White.copy(alpha = 0.8f),
                             fontSize = 16.sp
                         )
+                        if (player!= null) {
                         Text(
-                            text = "Player Name",
+                            text = "Player ${player.firstName} ${player.lastName}",
                             color = Color.White,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
+                    }
                     }
 
                     OutlinedTextField(

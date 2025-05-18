@@ -118,91 +118,91 @@ fun CoachHeaderSection(navController: NavController) {
                     colors = listOf(Color(0xFF142143), Color(0xFF3F5291))
                 )
             ) ){
-                Column {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = { showLogoutDialog = true },
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.logout),
-                                contentDescription = "Logout",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { showLogoutDialog = true },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.logout),
+                        contentDescription = "Logout",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
 
-                        Surface(
-                            modifier = Modifier.size(48.dp),
-                            shape = CircleShape,
-                            border = BorderStroke(1.dp, GoldYellow),
-                            color = Color.Transparent
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.profileimage),
-                                contentDescription = "Profile image",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable { navController.navigate("coach_profile") }
-                            )
-                        }
-                    }
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        val coach = viewModel.coach
-                        if (coach != null) {
-                            Text(
-                                text ="Welcome Back ",
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 16.sp
-                            )
-                        }
-                        if (coach != null) {
-                            Text(
-                                text = "Coach ${coach.firstName} ${coach.lastName}",
-                                color = Color.White,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = {
-                            Text(
-                                "Search teams, players, or news...",
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        },
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = CircleShape,
+                    border = BorderStroke(1.dp, GoldYellow),
+                    color = Color.Transparent
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.profileimage),
+                        contentDescription = "Profile image",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = "Search icon",
-                                tint = Color.White
-                            )
-                        },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                            focusedBorderColor = GoldYellow,
-                            cursorColor = GoldYellow
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                            .fillMaxSize()
+                            .clickable { navController.navigate("coach_profile") }
                     )
                 }
             }
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                val coach = viewModel.coach
+                if (coach != null) {
+                    Text(
+                        text ="Welcome Back ",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 16.sp
+                    )
+                }
+                if (coach != null) {
+                    Text(
+                        text = "Coach ${coach.firstName} ${coach.lastName}",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = {
+                    Text(
+                        "Search teams, players, or news...",
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Search icon",
+                        tint = Color.White
+                    )
+                },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    focusedBorderColor = GoldYellow,
+                    cursorColor = GoldYellow
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+        }
+    }
 }
 
 @Composable
