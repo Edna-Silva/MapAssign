@@ -26,26 +26,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Event
-import com.example.hockeynamibiaorg.data.viewModels.EventViewModelNew
+import com.example.hockeynamibiaorg.data.viewModels.EventViewModel
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun EventManagementScreen(navController: NavController, eventViewModel: EventViewModelNew = viewModel()) {
+fun EventManagementScreen(navController: NavController, eventViewModel: EventViewModel = viewModel()) {
     // State variables
     var selectedEvent by remember { mutableStateOf<Event?>(null) }
     var showAddEventDialog by remember { mutableStateOf(false) }
@@ -125,14 +123,15 @@ fun EventManagementScreen(navController: NavController, eventViewModel: EventVie
                 )
 
                 // Filter chips
-                Row(
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    listOf("ALL", "TOURNAMENT", "CAMP", "LEAGUE").forEach { type ->
+                    items(listOf("ALL", "TOURNAMENT", "CAMP", "LEAGUE")) { type ->
                         FilterChip(
+                            modifier = Modifier.widthIn(min = 80.dp),
                             selected = selectedFilter == type,
                             onClick = { selectedFilter = type },
                             label = { Text(type) },

@@ -8,10 +8,12 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
@@ -29,16 +31,24 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Event
-import com.example.hockeynamibiaorg.data.viewModels.EventViewModelNew
+import com.example.hockeynamibiaorg.data.viewModels.EventViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventEntriesScreen(navController: NavController, eventViewModel: EventViewModelNew = viewModel()) {
+fun EventEntriesScreen(navController: NavController, eventViewModel: EventViewModel = viewModel()) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf("ALL") }
     var filteredEvents by remember { mutableStateOf(emptyList<Event>()) }
+    var newEventNotification by remember { mutableStateOf<Event?>(null) }
 
     val events by eventViewModel.events.collectAsState()
+
+    // Firestore real-time listener for new events
+    LaunchedEffect(Unit) {
+        eventViewModel.listenForNewEvents { newEvent ->
+            newEventNotification = newEvent
+        }
+    }
 
     // Update filtered events when filter changes or search query changes
     LaunchedEffect(selectedFilter, searchQuery, events) {
@@ -91,6 +101,40 @@ fun EventEntriesScreen(navController: NavController, eventViewModel: EventViewMo
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
+                // New event notification banner
+                newEventNotification?.let { newEvent ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        color = Color(0xFFFFAF00),
+                        shape = RoundedCornerShape(8.dp),
+                        tonalElevation = 4.dp
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "New event added: ${newEvent.title}",
+                                color = Color(0xFF856404),
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = { newEventNotification = null }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Dismiss",
+                                    tint = Color(0xFF856404)
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Search bar
                 OutlinedTextField(
                     value = searchQuery,
@@ -138,14 +182,15 @@ fun EventEntriesScreen(navController: NavController, eventViewModel: EventViewMo
                 }
 
                 // Filter chips
-                Row(
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    listOf("ALL", "TOURNAMENT", "CAMP", "LEAGUE").forEach { type ->
+                    items(listOf("ALL", "TOURNAMENT", "CAMP", "LEAGUE")) { type ->
                         FilterChip(
+                            modifier = Modifier.widthIn(min = 80.dp),
                             selected = selectedFilter == type,
                             onClick = { selectedFilter = type },
                             label = { Text(type) },
