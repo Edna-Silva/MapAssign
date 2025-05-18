@@ -39,7 +39,6 @@ import com.example.hockeynamibiaorg.data.models.Coach
 import com.example.hockeynamibiaorg.ui.player.DetailRow
 import com.example.hockeynamibiaorg.ui.player.formatDate
 import com.example.hockeynamibiaorg.ui.theme.BlueAccent
-import com.example.hockeynamibiaorg.ui.theme.DarkBlue
 import com.example.hockeynamibiaorg.ui.theme.GoldYellow
 import com.example.hockeynamibiaorg.ui.theme.LighterBlue
 

@@ -35,6 +35,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.PlayerProfileViewModel
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.BlueAccent
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

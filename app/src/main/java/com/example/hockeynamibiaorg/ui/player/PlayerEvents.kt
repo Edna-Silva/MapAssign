@@ -32,6 +32,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Event
 import com.example.hockeynamibiaorg.data.viewModels.EventViewModel
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.BlueAccent
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -39,6 +39,11 @@ import com.example.hockeynamibiaorg.data.models.Event
 import com.example.hockeynamibiaorg.data.viewModels.EventViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.BlueAccent
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -436,52 +441,7 @@ fun ModernEventCard(
                             )
                         }
 
-                        // Action buttons for management
-                       /* Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedButton(
-                                onClick = { /* Handle edit */ },
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color(0xFF1A5D94)
-                                ),
-                                border = ButtonDefaults.outlinedButtonBorder.copy(
-                                    width = 1.dp
-                                    //color = Color(0xFF1A5D94)
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit",
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Edit")
-                            }
 
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            OutlinedButton(
-                                onClick = { /* Handle delete */ },
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color.Red
-                                ),
-                                border = ButtonDefaults.outlinedButtonBorder.copy(
-                                    width = 1.dp
-                                    //color = Color.Red
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete",
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Delete")
-                            }
-                        }*/
                     }
                 }
             }
@@ -769,8 +729,10 @@ fun EventDetailsDialog(
                                 label = { Text("Event Type") },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 12.dp),
-                                readOnly = true,
+                                    .padding(bottom = 12.dp)
+                                    .menuAnchor(), // Added the missing modifier
+
+                            readOnly = true,
                                 trailingIcon = {
                                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                                 },

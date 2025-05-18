@@ -34,6 +34,12 @@ import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.hockeynamibiaorg.data.models.Player
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.BlueAccent
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

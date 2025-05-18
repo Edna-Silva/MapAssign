@@ -1,10 +1,7 @@
 package com.example.hockeynamibiaorg.ui.player
-import android.widget.Toast
+
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,21 +16,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hockeynamibiaorg.data.models.Team
-import com.example.hockeynamibiaorg.data.models.User
-import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.hockeynamibiaorg.data.models.Player
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.BlueAccent
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerTeamScreen(navController: NavController, playerId: String) {

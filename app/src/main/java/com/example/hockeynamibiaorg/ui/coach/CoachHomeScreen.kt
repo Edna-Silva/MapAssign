@@ -33,6 +33,11 @@ import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.models.Coach
 import com.example.hockeynamibiaorg.data.viewModels.CoachProfileViewModel
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.BlueAccent
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
+
 
 
 
@@ -479,7 +484,7 @@ fun CoachMatchCard(match: MatchItem) {
 @Composable
 fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: String?) {
     NavigationBar(
-        containerColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+        containerColor =DarkBlue,
         contentColor = Color.White
     ) {
         NavigationBarItem(
@@ -488,9 +493,9 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
             selected = currentRoute == "coach_home",
             onClick = { navController.navigate("coach_home") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                selectedIconColor = GoldYellow,
+                selectedTextColor = GoldYellow,
+                indicatorColor = DarkBlue,
                 unselectedIconColor = Color.White,
                 unselectedTextColor = Color.White
             )
@@ -501,9 +506,9 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
             selected = currentRoute == "coach_events",
             onClick = { navController.navigate("coach_events") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                selectedIconColor = GoldYellow,
+                selectedTextColor = GoldYellow,
+                indicatorColor = DarkBlue,
                 unselectedIconColor = Color.White,
                 unselectedTextColor = Color.White
             )
@@ -514,9 +519,9 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
             selected = currentRoute == "teams",
             onClick = { navController.navigate("teams") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                selectedIconColor = GoldYellow,
+                selectedTextColor = GoldYellow,
+                indicatorColor = DarkBlue,
                 unselectedIconColor = Color.White,
                 unselectedTextColor = Color.White
             )
@@ -527,9 +532,9 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
             selected = currentRoute == "coach_profile",
             onClick = { navController.navigate("coach_profile") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
-                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                selectedIconColor = GoldYellow,
+                selectedTextColor = GoldYellow,
+                indicatorColor = DarkBlue,
                 unselectedIconColor = Color.White,
                 unselectedTextColor = Color.White
             )
