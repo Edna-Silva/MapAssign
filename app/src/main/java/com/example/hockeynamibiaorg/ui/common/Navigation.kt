@@ -18,6 +18,8 @@ sealed class Navigation(val route: String) {
     object CoachHome : Navigation("coach_home")
     object Teams : Navigation("teams")
     object Events : Navigation("coach_events")
+    object CoachProfile : Navigation("coach_profile")
+
     object PlayerManagement : Navigation("player_management")
-    object RemovePlayer : Navigation("remove_player")
+
 }

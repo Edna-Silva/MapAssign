@@ -511,7 +511,7 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
         NavigationBarItem(
             icon = { Icon(Icons.Default.DateRange, contentDescription = "Player Team") },
             label = { Text("Profile") },
-            selected = currentRoute == "player_profile",
+            selected = currentRoute == "player_team",
             onClick = { navController.navigate("player_team") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = GoldYellow,

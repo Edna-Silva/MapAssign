@@ -44,11 +44,11 @@ fun HockeyBottomBar(
                         Navigation.PlayerHome -> TODO()
                         Navigation.PlayerProfile -> TODO()
                         Navigation.Register -> TODO()
-                        Navigation.RemovePlayer -> TODO()
                         Navigation.Welcome -> TODO()
                         Navigation.ForgotPassword -> TODO()
                         Navigation.Logout -> TODO()
                         Navigation.PlayerTeam -> TODO()
+                        Navigation.CoachProfile -> TODO()
                     }
                 },
                 label = { Text(screen.route.substringAfter("_").replaceFirstChar { it.uppercase() }) },

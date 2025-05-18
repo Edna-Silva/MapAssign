@@ -406,8 +406,7 @@ fun TeammateItem(teammate: Player) {
                         fontSize = 12.sp
                     )
                 }
-            }
-        }
-    }
+            } }
+}
 }
 

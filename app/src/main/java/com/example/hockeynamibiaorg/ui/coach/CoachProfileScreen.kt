@@ -1,58 +1,55 @@
-package com.example.hockeynamibiaorg.ui.player
+package com.example.hockeynamibiaorg.ui.coach
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hockeynamibiaorg.data.viewModels.PlayerProfileViewModel
+import com.example.hockeynamibiaorg.data.viewModels.CoachProfileViewModel
 import com.example.hockeynamibiaorg.ui.theme.DarkBlue
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-
-
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.window.Dialog
-import com.example.hockeynamibiaorg.data.models.Player
-import com.example.hockeynamibiaorg.ui.theme.GoldYellow
-import com.example.hockeynamibiaorg.ui.theme.LighterBlue
-
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.window.Dialog
 
 import coil.compose.rememberAsyncImagePainter
 import com.example.hockeynamibiaorg.R
+import com.example.hockeynamibiaorg.data.models.Coach
+import com.example.hockeynamibiaorg.ui.player.DetailRow
+import com.example.hockeynamibiaorg.ui.player.formatDate
 import com.example.hockeynamibiaorg.ui.theme.BlueAccent
-
+import com.example.hockeynamibiaorg.ui.theme.DarkBlue
+import com.example.hockeynamibiaorg.ui.theme.GoldYellow
+import com.example.hockeynamibiaorg.ui.theme.LighterBlue
 
 @Composable
-fun PlayerProfileScreen(
-    playerId: String,
-    viewModel: PlayerProfileViewModel = viewModel()
+fun CoachProfileScreen(
+    coachId: String,
+    viewModel: CoachProfileViewModel = viewModel()
 ) {
-    LaunchedEffect(playerId) {
-        viewModel.loadPlayerProfile(playerId)
+    LaunchedEffect(coachId) {
+        viewModel.loadCoachProfile(coachId)
     }
 
     when {
@@ -76,10 +73,11 @@ fun PlayerProfileScreen(
                 )
             }
         }
-        viewModel.player != null -> {
-            PlayerProfile(
-                player = viewModel.player!!,
-                onPlayerUpdate = { viewModel.updatePlayer(it) }
+        viewModel.coach != null -> {
+            CoachProfile(
+                coach = viewModel.coach!!,
+                teamNames = viewModel.teamNames,
+                onCoachUpdate = { viewModel.updateCoach(it) }
             )
         }
         else -> {
@@ -97,7 +95,11 @@ fun PlayerProfileScreen(
     }
 }
 @Composable
-fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
+fun CoachProfile(
+    coach: Coach,
+    teamNames: List<String>,
+    onCoachUpdate: (Coach) -> Unit = {}
+) {
     var showEditDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -113,14 +115,14 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
                 .background(DarkBlue)
         ) {
             Text(
-                text = "Hockey Namibia Player",
+                text = "Hockey Namibia Coach",
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center))
         }
 
-        // Player image and basic info
+        // Coach image and basic info
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -128,12 +130,12 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = if (player.profileImageUrl.isNotEmpty()) {
-                    rememberAsyncImagePainter(player.profileImageUrl)
+                painter = if (coach.profileImageUrl.isNotEmpty()) {
+                    rememberAsyncImagePainter(coach.profileImageUrl)
                 } else {
                     painterResource(id = R.drawable.profileimage)
                 },
-                contentDescription = "Player image",
+                contentDescription = "Coach image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(120.dp)
@@ -145,26 +147,26 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
 
             Column {
                 Text(
-                    text = player.ageGroup,
+                    text = coach.ageGroup,
                     color = GoldYellow,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${player.firstName} ${player.lastName}",
+                    text = "${coach.firstName} ${coach.lastName}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = DarkBlue
                 )
                 Text(
-                    text = "Player",
+                    text = "Coach",
                     fontSize = 18.sp,
                     color = BlueAccent
                 )
             }
         }
 
-        // Player details card
+        // Coach details card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,7 +184,7 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Player Details",
+                        text = "Coach Details",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp),
@@ -200,15 +202,15 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
                     }
                 }
 
-                DetailRow("Age Group", player.ageGroup)
-                DetailRow("Email", player.email)
-                DetailRow("Phone", player.phoneNumber)
-                DetailRow("Status", if (player.isActive) "Active" else "Inactive")
-                DetailRow("Member Since", formatDate(player.dateJoined))
+                DetailRow("Age Group", coach.ageGroup)
+                DetailRow("Email", coach.email)
+                DetailRow("Phone", coach.phoneNumber)
+                DetailRow("Status", if (coach.isActive) "Active" else "Inactive")
+                DetailRow("Member Since", formatDate(coach.dateJoined))
             }
         }
 
-        // Stats card
+        // Teams card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -220,27 +222,72 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Season Stats",
+                    text = "Teams",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp),
                     color = DarkBlue
                 )
 
-                StatRow("Goals", player.goals)
-                StatRow("Points", player.points)
-                StatRow("Additional Stats", player.stats)
+                if (teamNames.isEmpty()) {
+                    Text(
+                        text = "No teams assigned",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                } else {
+                    teamNames.forEachIndexed { index, teamName ->
+                        Text(
+                            text = teamName,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            color = DarkBlue,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        // Stats card if available
+        if (coach.stats.isNotEmpty()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = LighterBlue)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Coaching Stats",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        color = DarkBlue
+                    )
+
+                    Text(
+                        text = coach.stats,
+                        color = DarkBlue,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
             }
         }
     }
 
     // Show edit dialog if needed
     if (showEditDialog) {
-        PlayerEditDialog(
-            player = player,
+        CoachEditDialog(
+            coach = coach,
             onDismiss = { showEditDialog = false },
-            onSave = { updatedPlayer ->
-                onPlayerUpdate(updatedPlayer)
+            onSave = { updatedCoach ->
+                onCoachUpdate(updatedCoach)
                 showEditDialog = false
             }
         )
@@ -248,12 +295,12 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
 }
 
 @Composable
-fun PlayerEditDialog(
-    player: Player,
+fun CoachEditDialog(
+    coach: Coach,
     onDismiss: () -> Unit,
-    onSave: (Player) -> Unit
+    onSave: (Coach) -> Unit
 ) {
-    var editablePlayer by remember { mutableStateOf(player) }
+    var editableCoach by remember { mutableStateOf(coach) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -266,72 +313,63 @@ fun PlayerEditDialog(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .verticalScroll(androidx.compose.foundation.rememberScrollState())
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
-                    text = "Edit Player Details",
+                    text = "Edit Coach Details",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 16.dp),
                     color = DarkBlue
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.firstName,
-                    onValueChange = { editablePlayer = editablePlayer.copy(firstName = it) },
+                    value = editableCoach.firstName,
+                    onValueChange = { editableCoach = editableCoach.copy(firstName = it) },
                     label = { Text("First Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.lastName,
-                    onValueChange = { editablePlayer = editablePlayer.copy(lastName = it) },
+                    value = editableCoach.lastName,
+                    onValueChange = { editableCoach = editableCoach.copy(lastName = it) },
                     label = { Text("Last Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.ageGroup,
-                    onValueChange = { editablePlayer = editablePlayer.copy(ageGroup = it) },
+                    value = editableCoach.ageGroup,
+                    onValueChange = { editableCoach = editableCoach.copy(ageGroup = it) },
                     label = { Text("Age Group") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.phoneNumber,
-                    onValueChange = { editablePlayer = editablePlayer.copy(phoneNumber = it) },
+                    value = editableCoach.phoneNumber,
+                    onValueChange = { editableCoach = editableCoach.copy(phoneNumber = it) },
                     label = { Text("Phone Number") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.email,
-                    onValueChange = { editablePlayer = editablePlayer.copy(email = it) },
+                    value = editableCoach.email,
+                    onValueChange = { editableCoach = editableCoach.copy(email = it) },
                     label = { Text("Email") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.goals,
-                    onValueChange = { editablePlayer = editablePlayer.copy(goals = it) },
-                    label = { Text("Goals") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    value = editableCoach.stats,
+                    onValueChange = { editableCoach = editableCoach.copy(stats = it) },
+                    label = { Text("Coaching Stats") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
-                    value = editablePlayer.points,
-                    onValueChange = { editablePlayer = editablePlayer.copy(points = it) },
-                    label = { Text("Points") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = editablePlayer.stats,
-                    onValueChange = { editablePlayer = editablePlayer.copy(stats = it) },
-                    label = { Text("Additional Stats") },
+                    value = editableCoach.teamId,
+                    onValueChange = { editableCoach = editableCoach.copy(teamId = it) },
+                    label = { Text("Team IDs (comma separated)") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -351,7 +389,7 @@ fun PlayerEditDialog(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Button(
-                        onClick = { onSave(editablePlayer) },
+                        onClick = { onSave(editableCoach) },
                         colors = ButtonDefaults.buttonColors(containerColor = GoldYellow)
                     ) {
                         Text("Save", color = DarkBlue)
@@ -360,48 +398,4 @@ fun PlayerEditDialog(
             }
         }
     }
-}
-@Composable
-fun DetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, fontWeight = FontWeight.Bold, color = DarkBlue)
-        Text(text = value, color = DarkBlue)
-    }
-}
-
-@Composable
-fun StatRow(statName: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = statName,
-            modifier = Modifier.weight(1f),
-            fontSize = 16.sp,
-            color = DarkBlue
-        )
-        Text(
-            text = value,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f),
-            color = DarkBlue
-        )
-    }
-}
-
-// Helper function to format date
-fun formatDate(timestamp: Long): String {
-    val date = java.util.Date(timestamp)
-    val format = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
-    return format.format(date)
 }

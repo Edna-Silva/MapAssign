@@ -484,16 +484,11 @@ fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: Str
                 modifier = Modifier.clickable { navController.navigate("teams") },
                 tint = Color.White
             )
+
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile",
-                modifier = Modifier.clickable { navController.navigate("player_management") },
-                tint = Color.White
-            )
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Profile",
-                modifier = Modifier.clickable { navController.navigate("player_profile") },
+                modifier = Modifier.clickable { navController.navigate("coach_profile") },
                 tint = Color.White
             )
         }
