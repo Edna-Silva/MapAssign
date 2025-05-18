@@ -30,6 +30,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
+import com.example.hockeynamibiaorg.data.models.Coach
+import com.example.hockeynamibiaorg.data.viewModels.CoachProfileViewModel
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
 
 
@@ -42,6 +44,8 @@ data class MatchItem(val teams: String, val dateTime: String, val venue: String)
 @Composable
 fun CoachHomeScreen(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+
     Scaffold(
         bottomBar = { CoachBottomNavigationBar(navController, currentRoute = currentRoute) }
     ) { paddingValues ->
@@ -63,6 +67,18 @@ fun CoachHeaderSection(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val userViewModel: UserViewModel = viewModel()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    val viewModel: CoachProfileViewModel = viewModel()
+
+    // Replace this with your actual logic to get the coachId (e.g., from auth or session)
+    val coachId = userViewModel.currentUser.value?.id
+
+    // Load coach profile once on first composition
+    LaunchedEffect(Unit) {
+        if (coachId != null) {
+            viewModel.loadCoachProfile(coachId)
+        }
+    }
+
 
     if (showLogoutDialog) {
         AlertDialog(
@@ -138,21 +154,25 @@ fun CoachHeaderSection(navController: NavController) {
                             )
                         }
                     }
-
                     Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(
-                            text = "Welcome Back, Coach!",
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 16.sp
-                        )
-                        Text(
-                            text = "Coach Name",
-                            color = Color.White,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        val coach = viewModel.coach
+                        if (coach != null) {
+                            Text(
+                                text ="Welcome Back ",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 16.sp
+                            )
+                        }
+                        if (coach != null) {
+                            Text(
+                                text = "Coach ${coach.firstName} ${coach.lastName}",
+                                color = Color.White,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
 
                     OutlinedTextField(
