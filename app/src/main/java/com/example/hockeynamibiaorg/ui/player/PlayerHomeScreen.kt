@@ -35,12 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.viewModels.PlayerProfileViewModel
 import com.example.hockeynamibiaorg.data.viewModels.UserViewModel
-// Reusing the same color palette from previous screens
-val DarkBlue = Color(0xFF142143)
-val GoldYellow = Color(0xFFFFAF00)
-val LightGray = Color(0xFFE4E4E4)
-val BlueAccent = Color(0xFF1A5D94)
-val LighterBlue = Color(0xFF2A6DA4)
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -512,7 +507,7 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
         )
 
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.group), contentDescription = "Player Team",modifier= Modifier.size(30.dp))},
+            icon = { Icon(painter = painterResource(id = R.drawable.group), contentDescription = "Player Team",modifier= Modifier.size(28.dp))},
             label = { Text("Teams") },
             selected = currentRoute == "player_team",
             onClick = { navController.navigate("player_team") },

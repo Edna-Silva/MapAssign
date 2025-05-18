@@ -20,12 +20,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.hockeynamibiaorg.R
 import com.example.hockeynamibiaorg.data.models.Team
 import com.example.hockeynamibiaorg.data.models.User
 import com.example.hockeynamibiaorg.data.viewModels.TeamViewModel
@@ -33,11 +35,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.hockeynamibiaorg.data.models.Player
 
-val DarkBlue = Color(0xFF142143)
-val GoldYellow = Color(0xFFFFAF00)
-val LightGray = Color(0xFFE4E4E4)
-val BlueAccent = Color(0xFF1A5D94)
-val LighterBlue = Color(0xFF2A6DA4)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,7 +102,7 @@ fun TeamScreen(navController: NavController) {
             ) {
                 Column {
                     Text(
-                        text = "Your Hockey Teams",
+                        text = " Hockey Teams",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -132,8 +129,8 @@ fun TeamScreen(navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = null,
+                            painter = painterResource(id = R.drawable.group),
+                            contentDescription = "Team Icon",
                             modifier = Modifier.size(72.dp),
                             tint = LighterBlue.copy(alpha = 0.5f)
                         )
@@ -174,7 +171,7 @@ fun TeamScreen(navController: NavController) {
                     teamViewModel.registerTeam(
                         name = teamName,
                         ageGroup = ageGroup,
-                        gender = "", // Add gender later
+                        gender = "", // TODO
                         category = category,
                         onSuccess = {
                             Toast.makeText(context, "Team created successfully", Toast.LENGTH_SHORT).show()
@@ -238,7 +235,7 @@ fun EnhancedTeamCard(team: Team, onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Home,
+                    painter = painterResource(id = R.drawable.group),
                     contentDescription = null,
                     tint = BlueAccent,
                     modifier = Modifier.size(32.dp)
@@ -275,7 +272,7 @@ fun EnhancedTeamCard(team: Team, onClick: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Icon(
-                        imageVector = Icons.Default.Home,
+                        painter = painterResource(id = R.drawable.application),
                         contentDescription = "Category",
                         tint = BlueAccent,
                         modifier = Modifier.size(16.dp)
@@ -309,9 +306,11 @@ fun EnhancedTeamCard(team: Team, onClick: () -> Unit) {
 
             // Arrow icon
             Icon(
-                imageVector = Icons.Default.Home,
+                painter = painterResource(id = R.drawable.group),
                 contentDescription = "View details",
-                tint = GoldYellow
+                tint = GoldYellow,
+                modifier= Modifier.size(20.dp)
+
             )
         }
     }
@@ -554,7 +553,7 @@ fun EnhancedTeamActionsDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Home,
+                                painter = painterResource(id = R.drawable.application),
                                 contentDescription = "Category",
                                 tint = BlueAccent,
                                 modifier = Modifier.size(20.dp)
@@ -917,55 +916,6 @@ fun TeamPlayersScreen(navController: NavController, teamId: String) {
 
 
 @Composable
-fun EnhancedPlayerItem(player: User) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Player Avatar
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(LighterBlue.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = BlueAccent,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = player.firstName,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = DarkBlue
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = player.email,
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-            }
-        }
-    }
-}@Composable
 fun EnhancedPlayerItem(player: Player, onClick: () -> Unit) {
     Card(
         modifier = Modifier
@@ -1049,9 +999,10 @@ fun EnhancedPlayerItem(player: Player, onClick: () -> Unit) {
 
             // Right arrow indicator
             Icon(
-                imageVector = Icons.Default.Home,
+                painter = painterResource(id = R.drawable.group),
                 contentDescription = "View details",
-                tint = GoldYellow
+                tint = GoldYellow,
+                modifier= Modifier.size(20.dp)
             )
         }
     }
@@ -1229,9 +1180,11 @@ fun EditTeamScreen(navController: NavController, teamId: String) {
                     shape = RoundedCornerShape(8.dp),
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Default.Home,
+                            painter = painterResource(id = R.drawable.application),
                             contentDescription = "Category",
-                            tint = BlueAccent
+                            tint = BlueAccent,
+                            modifier= Modifier.size(20.dp)
+
                         )
                     }
                 )
