@@ -509,11 +509,12 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
                 unselectedTextColor = Color.White
             )
         )
+
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profile") },
-            selected = currentRoute == "player_profile",
-            onClick = { navController.navigate("player_profile") },
+            icon = { Icon(Icons.Default.DateRange, contentDescription = "Player Team") },
+            label = { Text("Teams") },
+            selected = currentRoute == "player_team",
+            onClick = { navController.navigate("player_team") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = GoldYellow,
                 selectedTextColor = GoldYellow,
@@ -523,10 +524,10 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String?)
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.DateRange, contentDescription = "Player Team") },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
             label = { Text("Profile") },
-            selected = currentRoute == "player_team",
-            onClick = { navController.navigate("player_team") },
+            selected = currentRoute == "player_profile",
+            onClick = { navController.navigate("player_profile") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = GoldYellow,
                 selectedTextColor = GoldYellow,

@@ -478,48 +478,64 @@ fun CoachMatchCard(match: MatchItem) {
 
 @Composable
 fun CoachBottomNavigationBar(navController: NavHostController, currentRoute: String?) {
-    BottomAppBar(
-        containerColor = Color(0xFF033580),
-        contentColor = Color.Black
+    NavigationBar(
+        containerColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+        contentColor = Color.White
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Home",
-                modifier = Modifier.clickable { navController.navigate("coach_home") },
-                tint = Color.White
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            label = { Text("Home") },
+            selected = currentRoute == "coach_home",
+            onClick = { navController.navigate("coach_home") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                unselectedIconColor = Color.White,
+                unselectedTextColor = Color.White
             )
-            Icon(
-                imageVector = Icons.Default.Notifications,
-                contentDescription = "Matches",
-                modifier = Modifier.clickable { navController.navigate("coach_events") },
-                tint = Color.White
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Home, contentDescription = "Events") },
+            label = { Text("Events") },
+            selected = currentRoute == "coach_events",
+            onClick = { navController.navigate("coach_events") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                unselectedIconColor = Color.White,
+                unselectedTextColor = Color.White
             )
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Notifications",
-                modifier = Modifier.clickable { navController.navigate("teams") },
-                tint = Color.White
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.DateRange, contentDescription = "Coach Team") },
+            label = { Text("Teams") },
+            selected = currentRoute == "teams",
+            onClick = { navController.navigate("teams") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                unselectedIconColor = Color.White,
+                unselectedTextColor = Color.White
             )
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            label = { Text("Profile") },
+            selected = currentRoute == "coach_profile",
+            onClick = { navController.navigate("coach_profile") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                selectedTextColor = com.example.hockeynamibiaorg.ui.player.GoldYellow,
+                indicatorColor = com.example.hockeynamibiaorg.ui.player.DarkBlue,
+                unselectedIconColor = Color.White,
+                unselectedTextColor = Color.White
+            )
+        )
 
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Profile",
-                modifier = Modifier.clickable { navController.navigate("coach_profile") },
-                tint = Color.White
-            )
         }
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun CoachHomeScreenPreview() {
-    val navController = rememberNavController()
-    MaterialTheme {
-        CoachHomeScreen(navController = navController)
-    }
-}
+
