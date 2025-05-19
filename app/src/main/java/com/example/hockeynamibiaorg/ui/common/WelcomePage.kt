@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -247,6 +248,17 @@ fun WelcomeScreen(navController: NavController) {
                         navController.navigate("Register")
                     }
                 }
+                Text(
+                    text = "Get to know us",
+                    color = Color(0xFF2A7DBD), // Optional: use your blue tone
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(Navigation.UserCommon.route)
+                        }
+                        .padding(vertical = 8.dp)
+                        .align(Alignment.CenterHorizontally) // Optional for layout alignment
+                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))

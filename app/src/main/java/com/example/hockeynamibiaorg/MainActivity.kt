@@ -31,6 +31,7 @@ import com.example.hockeynamibiaorg.ui.player.PlayerHomeScreen
 
 
 import com.example.hockeynamibiaorg.ui.coach.*
+import com.example.hockeynamibiaorg.ui.common.UserCommon
 import com.example.hockeynamibiaorg.ui.player.PlayerProfileScreen
 import com.example.hockeynamibiaorg.ui.player.PlayerTeamScreen
 import com.google.firebase.FirebaseApp
@@ -49,7 +50,7 @@ class MainActivity : ComponentActivity() {
             when (sessionManager.getUserRole()?.lowercase()) {
                 "coach" -> Navigation.CoachHome.route
                 "player" -> Navigation.PlayerHome.route
-                else -> Navigation.Login.route
+                else -> Navigation.UserCommon.route
             }
         } else {
             Navigation.Welcome.route
@@ -110,6 +111,10 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
         // Coach Screens
         composable(Navigation.CoachHome.route) {
             CoachHomeScreen(navController)
+        }
+
+        composable(Navigation.UserCommon.route) {
+            UserCommon(navController)
         }
         composable(Navigation.Teams.route) {
             TeamScreen(navController)

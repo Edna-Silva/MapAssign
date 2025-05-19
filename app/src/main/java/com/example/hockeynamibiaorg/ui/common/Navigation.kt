@@ -6,7 +6,7 @@ sealed class Navigation(val route: String) {
     object Register : Navigation("register")
     object ForgotPassword : Navigation("forgot_password")
     object Logout : Navigation("logout")
-
+    object UserCommon:Navigation("userCommon")
 
     // Player routes
     object PlayerHome : Navigation("player_home")
