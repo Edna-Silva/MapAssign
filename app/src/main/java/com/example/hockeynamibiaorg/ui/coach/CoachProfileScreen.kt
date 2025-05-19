@@ -1,6 +1,7 @@
 package com.example.hockeynamibiaorg.ui.coach
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 import coil.compose.rememberAsyncImagePainter
 import com.example.hockeynamibiaorg.R
@@ -45,8 +49,10 @@ import com.example.hockeynamibiaorg.ui.theme.LighterBlue
 @Composable
 fun CoachProfileScreen(
     coachId: String,
-    viewModel: CoachProfileViewModel = viewModel()
-) {
+    navController: NavController,
+    viewModel: CoachProfileViewModel = viewModel(),
+
+    ) {
     LaunchedEffect(coachId) {
         viewModel.loadCoachProfile(coachId)
     }
@@ -76,7 +82,8 @@ fun CoachProfileScreen(
             CoachProfile(
                 coach = viewModel.coach!!,
                 teamNames = viewModel.teamNames,
-                onCoachUpdate = { viewModel.updateCoach(it) }
+                onCoachUpdate = { viewModel.updateCoach(it) },
+                navController = navController
             )
         }
         else -> {
@@ -93,164 +100,151 @@ fun CoachProfileScreen(
         }
     }
 }
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachProfile(
     coach: Coach,
     teamNames: List<String>,
-    onCoachUpdate: (Coach) -> Unit = {}
+    onCoachUpdate: (Coach) -> Unit = {},
+    navController: NavController
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        // Header with team colors
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .background(DarkBlue)
-        ) {
-            Text(
-                text = "Hockey Namibia Coach",
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.Center))
-        }
-
-        // Coach image and basic info
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = if (coach.profileImageUrl.isNotEmpty()) {
-                    rememberAsyncImagePainter(coach.profileImageUrl)
-                } else {
-                    painterResource(id = R.drawable.profileimage)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Coach Profile",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
                 },
-                contentDescription = "Coach image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .border(3.dp, GoldYellow, CircleShape)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = coach.ageGroup,
-                    color = GoldYellow,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color(0xFF142143),
+                    navigationIconContentColor = Color(0xFF142143)
                 )
+            )
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(DarkBlue)
+            ) {
                 Text(
-                    text = "${coach.firstName} ${coach.lastName}",
+                    text = "Hockey Namibia Coach",
+                    color = Color.White,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = DarkBlue
-                )
-                Text(
-                    text = "Coach",
-                    fontSize = 18.sp,
-                    color = BlueAccent
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
-        }
 
-        // Coach details card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .clickable { showEditDialog = true },
-            shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(containerColor = LighterBlue)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+            // Image and Info
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Image(
+                    painter = if (coach.profileImageUrl.isNotEmpty()) {
+                        rememberAsyncImagePainter(coach.profileImageUrl)
+                    } else {
+                        painterResource(id = R.drawable.profileimage)
+                    },
+                    contentDescription = "Coach image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .border(3.dp, GoldYellow, CircleShape)
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column {
                     Text(
-                        text = "Coach Details",
+                        text = coach.ageGroup,
+                        color = GoldYellow,
                         fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${coach.firstName} ${coach.lastName}",
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp),
                         color = DarkBlue
                     )
-                    IconButton(
-                        onClick = { showEditDialog = true },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Details",
-                            tint = DarkBlue
-                        )
-                    }
-                }
-
-                DetailRow("Age Group", coach.ageGroup)
-                DetailRow("Email", coach.email)
-                DetailRow("Phone", coach.phoneNumber)
-                DetailRow("Status", if (coach.isActive) "Active" else "Inactive")
-                DetailRow("Member Since", formatDate(coach.dateJoined))
-            }
-        }
-
-        // Teams card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(containerColor = LighterBlue)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Teams",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp),
-                    color = DarkBlue
-                )
-
-                if (teamNames.isEmpty()) {
                     Text(
-                        text = "No teams assigned",
-                        color = Color.Gray,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        text = "Coach",
+                        fontSize = 18.sp,
+                        color = BlueAccent
                     )
-                } else {
-                    teamNames.forEachIndexed { index, teamName ->
-                        Text(
-                            text = teamName,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            color = DarkBlue,
-                            fontSize = 16.sp
-                        )
-                    }
                 }
             }
-        }
 
-        // Stats card if available
-        if (coach.stats.isNotEmpty()) {
+            // Coach details
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .clickable { showEditDialog = true },
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = LighterBlue)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Coach Details",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = DarkBlue
+                        )
+                        IconButton(
+                            onClick = { showEditDialog = true },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Details",
+                                tint = DarkBlue
+                            )
+                        }
+                    }
+
+                    DetailRow("Age Group", coach.ageGroup)
+                    DetailRow("Email", coach.email)
+                    DetailRow("Phone", coach.phoneNumber)
+                    DetailRow("Status", if (coach.isActive) "Active" else "Inactive")
+                    DetailRow("Member Since", formatDate(coach.dateJoined))
+                }
+            }
+
+            // Team Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -258,40 +252,73 @@ fun CoachProfile(
                 shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(containerColor = LighterBlue)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Coaching Stats",
+                        text = "Teams",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp),
                         color = DarkBlue
                     )
-
-                    Text(
-                        text = coach.stats,
-                        color = DarkBlue,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    if (teamNames.isEmpty()) {
+                        Text(
+                            text = "No teams assigned",
+                            color = Color.Gray,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        teamNames.forEach { teamName ->
+                            Text(
+                                text = teamName,
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                color = DarkBlue,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
                 }
+            }
+
+            // Stats
+            if (coach.stats.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = LighterBlue)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Coaching Stats",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = DarkBlue
+                        )
+                        Text(
+                            text = coach.stats,
+                            color = DarkBlue,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+                }
+            }
+
+            // Show dialog
+            if (showEditDialog) {
+                CoachEditDialog(
+                    coach = coach,
+                    onDismiss = { showEditDialog = false },
+                    onSave = { updatedCoach ->
+                        onCoachUpdate(updatedCoach)
+                        showEditDialog = false
+                    }
+                )
             }
         }
     }
-
-    // Show edit dialog if needed
-    if (showEditDialog) {
-        CoachEditDialog(
-            coach = coach,
-            onDismiss = { showEditDialog = false },
-            onSave = { updatedCoach ->
-                onCoachUpdate(updatedCoach)
-                showEditDialog = false
-            }
-        )
-    }
 }
+
 
 @Composable
 fun CoachEditDialog(

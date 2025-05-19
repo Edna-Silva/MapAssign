@@ -128,12 +128,12 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
             PlayerProfileScreen(playerId)
         }
         composable(Navigation.CoachProfile.route){
-            CoachProfileScreen(userId)
+            CoachProfileScreen(userId,navController)
         }
         composable(
             "coach_profile/{coachId}") { backStackEntry ->
             val coachId = backStackEntry.arguments?.getString("coachId") ?: ""
-            CoachProfileScreen(coachId)
+            CoachProfileScreen(coachId, navController)
         }
 
         // Dynamic Routes
