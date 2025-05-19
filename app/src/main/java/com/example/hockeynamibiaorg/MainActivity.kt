@@ -120,12 +120,12 @@ fun HockeyApp(startDestination: String, userViewModel: UserViewModel) {
 
 // Composable destination registration
         composable(Navigation.PlayerProfile.route){
-            PlayerProfileScreen(userId)
+            PlayerProfileScreen(userId, navController)
         }
         composable(
             "player_profile/{playerId}") { backStackEntry ->
             val playerId = backStackEntry.arguments?.getString("playerId") ?: ""
-            PlayerProfileScreen(playerId)
+            PlayerProfileScreen(playerId, navController)
         }
         composable(Navigation.CoachProfile.route){
             CoachProfileScreen(userId,navController)

@@ -30,16 +30,19 @@ import com.example.hockeynamibiaorg.ui.theme.LighterBlue
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
 
 import coil.compose.rememberAsyncImagePainter
 import com.example.hockeynamibiaorg.R
@@ -49,6 +52,7 @@ import com.example.hockeynamibiaorg.ui.theme.BlueAccent
 @Composable
 fun PlayerProfileScreen(
     playerId: String,
+    navController: NavController,
     viewModel: PlayerProfileViewModel = viewModel()
 ) {
     LaunchedEffect(playerId) {
@@ -79,7 +83,8 @@ fun PlayerProfileScreen(
         viewModel.player != null -> {
             PlayerProfile(
                 player = viewModel.player!!,
-                onPlayerUpdate = { viewModel.updatePlayer(it) }
+                onPlayerUpdate = { viewModel.updatePlayer(it) },
+                navController=navController
             )
         }
         else -> {
@@ -96,29 +101,57 @@ fun PlayerProfileScreen(
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
+fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}, navController:NavController) {
     var showEditDialog by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        // Header with team colors
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .background(DarkBlue)
-        ) {
-            Text(
-                text = "Hockey Namibia Player",
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.Center))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Coach Profile",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color(0xFF142143),
+                    navigationIconContentColor = Color(0xFF142143)
+                )
+            )
         }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(DarkBlue)
+            ) {
+                Text(
+                    text = "Hockey Namibia Player",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
         // Player image and basic info
         Row(
@@ -244,6 +277,7 @@ fun PlayerProfile(player: Player, onPlayerUpdate: (Player) -> Unit = {}) {
                 showEditDialog = false
             }
         )
+    }
     }
 }
 

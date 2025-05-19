@@ -23,6 +23,7 @@ import com.example.hockeynamibiaorg.ui.common.SecondaryButton
 import androidx.compose.foundation.background
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 
 // Define the colors from the palette
@@ -35,6 +36,7 @@ val buttonGradient = Brush.horizontalGradient(
     colors = listOf(navyBlue, blue)
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
     // Define the gradient
@@ -114,27 +116,44 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel = vie
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
+            val lightLightBlue = Color(0xFFE6F0FF)
 
             // White fields with black text
-            AppTextField(
-                label = "Email Address",
+            OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = white,
-                textColor = black
+                label = { Text("Email Address", color = black) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedTextColor = black,
+                    unfocusedTextColor = black,
+                    containerColor = lightLightBlue,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f)
+                ),
+                shape = MaterialTheme.shapes.medium
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AppTextField(
-                label = "Password",
-                isPassword = true,
+            OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = white,
-                textColor = black
+                label = { Text("Password", color = black) },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedTextColor = black,
+                    unfocusedTextColor = black,
+                    containerColor = lightLightBlue,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f)
+                ),
+                shape = MaterialTheme.shapes.medium
             )
 
             Spacer(modifier = Modifier.height(24.dp))
