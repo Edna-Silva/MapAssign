@@ -21,6 +21,7 @@ import com.example.hockeynamibiaorg.ui.common.AppTextField
 import com.example.hockeynamibiaorg.ui.common.Navigation
 import com.example.hockeynamibiaorg.ui.common.SecondaryButton
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -198,40 +199,23 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel = vie
                 )
 
                 // Forgot password styled as button with same shape
-                Button(
-                    onClick = { navController.navigate(Navigation.ForgotPassword.route) },
+                Text(
+                    text = "Forgot Password?",
+                    color = Color(0xFF2A7DBD), // Optional: use your blue tone
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    ),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color(0xFF243665),  // Lighter navy blue
-                                    Color(0xFF2A7DBD)   // Lighter blue
-                                )
-                            ))
-                            .clip(MaterialTheme.shapes.medium),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Forgot Password?",
-                            color = white,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                        .clickable {
+                            navController.navigate(Navigation.ForgotPassword.route)
+                        }
+                        .padding(vertical = 8.dp)
+                        .align(Alignment.CenterHorizontally) // Optional for layout alignment
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
     val context = LocalContext.current
@@ -292,15 +276,24 @@ fun ForgotPasswordScreen(navController: NavController, userViewModel: UserViewMo
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
+            val lightLightBlue = Color(0xFFE6F0FF)
 
             // White field with black text
-            AppTextField(
-                label = "Email Address",
+            OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = white,
-                textColor = black
+                label = { Text("Email Address", color = black) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedTextColor = black,
+                    unfocusedTextColor = black,
+                    containerColor = lightLightBlue,
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f)
+                ),
+                shape = MaterialTheme.shapes.medium
             )
 
             Spacer(modifier = Modifier.height(24.dp))
