@@ -247,18 +247,20 @@ fun WelcomeScreen(navController: NavController) {
                     ) {
                         navController.navigate("Register")
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Get to know us",
+                        color = Color(0xFF2A7DBD), // Optional: use your blue tone
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(Navigation.UserCommon.route)
+                            }
+                            .padding(vertical = 8.dp)
+                            .align(Alignment.CenterHorizontally) // Optional for layout alignment
+                    )
                 }
-                Text(
-                    text = "Get to know us",
-                    color = Color(0xFF2A7DBD), // Optional: use your blue tone
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .clickable {
-                            navController.navigate(Navigation.UserCommon.route)
-                        }
-                        .padding(vertical = 8.dp)
-                        .align(Alignment.CenterHorizontally) // Optional for layout alignment
-                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
