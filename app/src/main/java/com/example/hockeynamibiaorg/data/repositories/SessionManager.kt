@@ -10,8 +10,9 @@ import com.google.gson.Gson
  * Manages user session data throughout the application
  */
 class SessionManager(context: Context) {
+    // its used to temporally store user info
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        "HockeyNamibiaPrefs", Context.MODE_PRIVATE
+        "HockeyNamibiaPrefs", Context.MODE_PRIVATE // data is stored in the xml file
     )
     private val gson = Gson()
 

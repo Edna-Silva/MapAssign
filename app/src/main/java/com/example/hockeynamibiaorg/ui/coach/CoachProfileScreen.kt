@@ -245,7 +245,7 @@ fun CoachProfile(
             }
 
             // Team Card
-            Card(
+            /*Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
@@ -276,7 +276,7 @@ fun CoachProfile(
                         }
                     }
                 }
-            }
+            }*/
 
             // Stats
             if (coach.stats.isNotEmpty()) {

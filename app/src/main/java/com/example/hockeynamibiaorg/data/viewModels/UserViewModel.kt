@@ -46,13 +46,22 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                val user = userService.getUserByEmail(email)
+                // First authenticate with Firebase
+                val authSuccess = authService.signInWithEmailAndPassword(email, password)
 
-                if (user != null) {
-                    // Save user to session
-                    sessionManager.saveUserData(user)
-                    _currentUser.value = user
-                    _loginSuccess.value = true
+                if (authSuccess) {
+                    // If Firebase auth succeeds, get user data from your database
+                    val user = userService.getUserByEmail(email)
+
+                    if (user != null) {
+                        // Save user to session
+                        sessionManager.saveUserData(user)
+                        _currentUser.value = user
+                        _loginSuccess.value = true
+                    } else {
+                        _errorMessage.value = "User profile not found. Please contact support."
+                        authService.signOut() // Sign out from Firebase if user data not found
+                    }
                 } else {
                     _errorMessage.value = "Invalid email or password"
                 }
@@ -81,6 +90,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         sessionManager.clearUserData()
         _currentUser.value = null
         _loginSuccess.value = false
+        authService.signOut()
     }
 
     fun getUserRoleDestination(): String {

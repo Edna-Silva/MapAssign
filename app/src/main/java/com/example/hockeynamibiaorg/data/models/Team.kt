@@ -1,11 +1,12 @@
 package com.example.hockeynamibiaorg.data.models
 data class Team(
-    var id: String = "",
+    val id: String = "",
     val name: String = "",
     val ageGroup: String = "",
-    val category: String = "", // "Indoor", "Outdoor", or "Mixed"
-    val coachId: String = "", // ID of the coach who created the team
-    val players: List<String> = emptyList(),
-    val gender:String=""
-// List of player IDs
+    val gender: String = "",
+    val category: String = "",
+    val coachId: String = "", // Link to the coach who created this team
+    val players: List<String> = emptyList(), // List of player IDs
+    val dateCreated: Long = System.currentTimeMillis(),
+    val isActive: Boolean = true
 )

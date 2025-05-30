@@ -4,7 +4,6 @@ package com.example.hockeynamibiaorg.data.repositories
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 
 class AuthService {
@@ -18,7 +17,7 @@ class AuthService {
             auth.createUserWithEmailAndPassword(email, password).await()
             true
         } catch (e: Exception) {
-            Log.e("AuthService", "Auth error: ${e.message}", e) // Add this line
+            Log.e("AuthService", "Auth error: ${e.message}", e) //error occurs if anything wrong happens in the firebase
             false
         }
     }
@@ -26,10 +25,6 @@ class AuthService {
         auth.currentUser?.delete()
     }
 
-
-    /**
-     * Sign in with email and password
-     */
     suspend fun signInWithEmailAndPassword(email: String, password: String): Boolean {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
@@ -39,7 +34,6 @@ class AuthService {
             false
         }
     }
-
     /**
      * Send password reset email
      */
@@ -60,36 +54,6 @@ class AuthService {
         auth.signOut()
     }
 
-    /**
-     * Get current user
-     */
-    fun getCurrentUser(): FirebaseUser? {
-        return auth.currentUser
-    }
-
-    /**
-     * Delete current user
-     */
 
 
-    /**
-     * Check if user is logged in
-     */
-    fun isUserLoggedIn(): Boolean {
-        return auth.currentUser != null
-    }
-
-    /**
-     * Get current user email
-     */
-    fun getCurrentUserEmail(): String? {
-        return auth.currentUser?.email
-    }
-
-    /**
-     * Get current user ID
-     */
-    fun getCurrentUserId(): String? {
-        return auth.currentUser?.uid
-    }
 }

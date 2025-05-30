@@ -41,7 +41,7 @@ import com.example.hockeynamibiaorg.ui.theme.GoldYellow
 
 
 
-
+// Update the TeamScreen to include coach context information
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamScreen(navController: NavController) {
@@ -52,9 +52,10 @@ fun TeamScreen(navController: NavController) {
     var showAddTeamDialog by remember { mutableStateOf(false) }
     var selectedTeam by remember { mutableStateOf<Team?>(null) }
     var showTeamDialog by remember { mutableStateOf(false) }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        teamViewModel.loadTeams()
+        teamViewModel.loadTeams() // This now loads only the current coach's teams
     }
 
     Scaffold(
@@ -62,7 +63,7 @@ fun TeamScreen(navController: NavController) {
             TopAppBar(
                 title = {
                     Text(
-                        "Team Management",
+                        "My Teams",
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -108,14 +109,14 @@ fun TeamScreen(navController: NavController) {
             ) {
                 Column {
                     Text(
-                        text = " Hockey Teams",
+                        text = "My Hockey Teams",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Manage teams and players",
+                        text = "Manage your teams and players • ${teams.size} teams",
                         fontSize = 16.sp,
                         color = Color.White.copy(alpha = 0.8f)
                     )
@@ -142,11 +143,30 @@ fun TeamScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "No teams yet. Click the + button to add a team.",
+                            text = "No teams created yet",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = DarkBlue
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Create your first team to start managing players and organizing events.",
                             textAlign = TextAlign.Center,
                             color = Color.Gray,
                             fontSize = 16.sp
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { showAddTeamDialog = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = BlueAccent
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Create First Team")
+                        }
                     }
                 }
             } else {
@@ -177,7 +197,7 @@ fun TeamScreen(navController: NavController) {
                     teamViewModel.registerTeam(
                         name = teamName,
                         ageGroup = ageGroup,
-                        gender = "", // TODO
+                        gender = "", // You can add gender field back if needed
                         category = category,
                         onSuccess = {
                             Toast.makeText(context, "Team created successfully", Toast.LENGTH_SHORT).show()
@@ -198,9 +218,8 @@ fun TeamScreen(navController: NavController) {
                     selectedTeam = null
                 },
                 onDelete = {
-                    teamViewModel.deleteTeam(selectedTeam!!.id)
                     showTeamDialog = false
-                    selectedTeam = null
+                    showDeleteConfirmation = true
                 },
                 onEdit = {
                     navController.navigate("editTeam/${selectedTeam?.id}")
@@ -209,6 +228,123 @@ fun TeamScreen(navController: NavController) {
                 onViewPlayers = {
                     navController.navigate("teamPlayers/${selectedTeam?.id}")
                     showTeamDialog = false
+                }
+            )
+        }
+
+        // Enhanced Delete Confirmation Dialog
+        if (showDeleteConfirmation && selectedTeam != null) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDeleteConfirmation = false
+                    selectedTeam = null
+                },
+                containerColor = Color.White,
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Warning",
+                            tint = Color(0xFFE53935),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Delete Team",
+                            fontWeight = FontWeight.Bold,
+                            color = DarkBlue
+                        )
+                    }
+                },
+                text = {
+                    Column {
+                        Text(
+                            "Are you sure you want to delete \"${selectedTeam!!.name}\"?",
+                            fontWeight = FontWeight.Medium,
+                            color = DarkBlue
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFFFEBEE)
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Text(
+                                    "This action will:",
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFFD32F2F),
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    "• Remove all players from this team",
+                                    color = Color(0xFFD32F2F),
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    "• Delete all team events and schedules",
+                                    color = Color(0xFFD32F2F),
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    "• Permanently delete the team",
+                                    color = Color(0xFFD32F2F),
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    "This action cannot be undone.",
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFD32F2F),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            teamViewModel.deleteTeam(selectedTeam!!.id)
+                            showDeleteConfirmation = false
+                            selectedTeam = null
+                            Toast.makeText(
+                                context,
+                                "Team deleted successfully with all related data",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE53935)
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Delete Team")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            showDeleteConfirmation = false
+                            selectedTeam = null
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = BlueAccent
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             )
         }

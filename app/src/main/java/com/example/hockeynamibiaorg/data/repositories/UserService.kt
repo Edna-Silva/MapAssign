@@ -82,7 +82,7 @@ class UserService {
                     )
                     createCoach(coach)
                 }
-                else -> true // For other roles, just create the user
+                else -> true
             }
         } catch (e: Exception) {
             Log.e("UserService", "Registration failed: ${e.message}", e)
@@ -90,7 +90,7 @@ class UserService {
         }
     }
 
-    // ✅ KEEP this to check for duplicates before registration
+    //  check for duplicates before registration
     suspend fun getUserByEmail(email: String): User? {
         return try {
             val querySnapshot = usersCollection
@@ -110,17 +110,5 @@ class UserService {
     }
 
 
-    suspend fun getUserById(userId: String): User? {
-        return try {
-            val document = usersCollection.document(userId).get().await()
-            if (document.exists()) {
-                document.toObject(User::class.java)
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("UserService", "Get user by ID failed: ${e.message}", e)
-            null
-        }
-    }
+
 }
